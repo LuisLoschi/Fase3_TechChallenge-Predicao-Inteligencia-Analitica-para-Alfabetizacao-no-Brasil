@@ -731,8 +731,8 @@ intervalo de 95% da própria projeção**. Testes: de 63 para **84**, os 21 novo
    96,9% no consolidado. O terceiro grupo se chama "risco alto e cobertura menor", e não
    "com baixa participação", por causa disso.
 5. **O limiar de porte para meta individual é 119 alunos, não "cerca de 50".** O ponto em
-   que `a²/n = c²` no ajuste `sd(n) = √(a²/n + c²)` marca 119, e são **51,6% dos
-   municípios brasileiros**. O `k` da mistura de credibilidade dá 55 pelo caminho
+   que `a²/n = c²` no ajuste `sd(n) = √(a²/n + c²)` marca 119, e são **51,6% dos municípios
+   com meta publicada e 52,3% da coorte inteira**. O `k` da mistura de credibilidade dá 55 pelo caminho
    independente. A faixa entre 55 e 119 é onde a avaliação individual começa a fazer
    sentido; abaixo de 55 ela não faz nenhum.
 

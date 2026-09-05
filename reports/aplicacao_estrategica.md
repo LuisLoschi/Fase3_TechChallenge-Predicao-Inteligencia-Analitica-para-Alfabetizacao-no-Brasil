@@ -468,8 +468,8 @@ o resíduo é ruído amostral. Os três preditores testados ficam entre 0,4876 e
 
 **A recomendação que sai daí:** municípios com menos de **119 alunos avaliados**
 — o porte em que `a²/n = c²`, ou seja, em que o ruído de amostragem deixa de ser
-o componente dominante da oscilação anual, e que são **51,6% dos municípios
-brasileiros** — não deveriam ter metas avaliadas individualmente sem intervalo de
+o componente dominante da oscilação anual, e que são **51,6% dos municípios com meta
+publicada e 52,3% da coorte inteira** — não deveriam ter metas avaliadas individualmente sem intervalo de
 confiança publicado ao lado. Para eles, a unidade de avaliação precisa ser
 plurianual, ou agrupada por microrregião, ou por grupo de perfil semelhante.
 Avaliar um município de trinta alunos contra uma meta de dois pontos percentuais
