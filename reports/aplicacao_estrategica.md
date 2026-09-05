@@ -377,9 +377,12 @@ correlação de 0,9894.
 | Percentil 95 | +26,91 pp |
 | Mínimo / máximo | −76,28 pp / +68,90 pp |
 
-A distribuição é bimodal por construção. A meta foi desenhada como trajetória
-linear da taxa base até 80% em 2030, então quem estava longe recebeu inclinação
-alta e quem estava perto recebeu quase nada.
+A distribuição é larga e assimétrica: metade dos municípios cabe entre −7,6 e
++11,3 pp, e as caudas vão de −76,3 a +68,9. A largura vem do desenho da meta
+como trajetória linear da taxa base até 80% em 2030 — quem estava longe recebeu
+inclinação alta, quem estava perto recebeu quase nada, e o resultado é que o
+mesmo "atingir a meta de 2025" significa coisas muito diferentes de um município
+para outro.
 
 ### 8b. Projeção com incerteza — probabilidade, nunca rótulo
 
