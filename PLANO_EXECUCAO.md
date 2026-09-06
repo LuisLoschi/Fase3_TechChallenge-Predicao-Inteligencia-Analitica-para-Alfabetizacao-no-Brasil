@@ -1,3 +1,5 @@
+> **Atualização 2026-09-05 — retorno CRISP-DM:** este plano registra decisões históricas. A revisão corrigiu o protocolo de seleção e a projeção municipal. Conclusões anteriores sobre teste intocado, escola, imprevisibilidade e corte de porte foram substituídas em [reports/revisao_cientifica.md](reports/revisao_cientifica.md). Pendem validação prospectiva, dimensão socioeconômica e vídeo.
+
 # Plano de Execução — Tech Challenge Fase 3
 
 > Documento vivo de acompanhamento. Cada etapa é marcada como concluída conforme a execução avança.
@@ -17,7 +19,8 @@
 | 4. Modelagem supervisionada | `[x]` concluído |
 | 5. Interpretabilidade | `[x]` concluído |
 | 6. Aplicação estratégica | `[x]` concluído |
-| 7. Documentação e entregáveis | `[ ]` |
+| 7. Documentação e entregáveis | `[~]` em andamento |
+| 8. Revisão científica | `[~]` correções aplicadas; gates externos abertos |
 
 ---
 
@@ -223,7 +226,7 @@ duas foi o que fez o primeiro teste de metas falhar, e ali o errado era o teste,
 │   ├── evaluation/
 │   │   ├── metrics.py          # métricas + calibração + threshold
 │   │   └── interpret.py        # SHAP, permutation importance
-│   └── visualization/plots.py
+│   └── visualization/plots_features.py
 ├── models/                     # GITIGNORED
 ├── reports/
 │   ├── metrics/*.json
@@ -552,8 +555,8 @@ inequívoco — a questão nunca foi se existe, foi de que grão ele é.
 **Confirmado como previsto:** a `learning_curve` está achatada (de 979 para 3.309 municípios,
 3,4x mais dado, a validação sobe 0,0039), o que confirma teto informacional e não amostral; o
 `caderno` se comportou como controle negativo (queda de 0,00031 contra 0,04203 do controle
-positivo); e no grão municipal, que é onde a decisão acontece, o R² é **0,625 na base completa
-e 0,777 nos municípios com 200+ alunos** — acima do 0,42/0,65 que o plano estimava.
+positivo); e no grão municipal, que é onde a decisão acontece, o R² é **0,624 na base completa
+e 0,774 nos municípios com 200+ alunos** — acima do 0,42/0,65 que o plano estimava.
 
 ### O que a Etapa 5 recebe
 
@@ -758,6 +761,10 @@ publicado ao lado; a unidade de avaliação precisa ser plurianual ou agrupada.
   `ordenacao_fragil`, `taxa_presenca_2024` e `n_alunos_avaliados`),
   `reports/clusters_municipais.csv` (5.461) e `reports/projecao_metas_municipios.csv`
   (5.352, com `meta_dentro_do_intervalo` e `meta_avaliavel_individualmente`).
+  *Duas dessas colunas foram renomeadas na revisão, porque os nomes afirmavam mais do que a
+  medição sustentava: `ordenacao_fragil` virou `faixa_shap_taxa_municipal` e
+  `meta_avaliavel_individualmente` virou `porte_abaixo_referencia_dispersao`. Quem procurar os
+  nomes antigos nos CSV não os encontrará; ver o guia de execução.*
 - **Quatro limitações novas para a lista do README**, além das dezesseis já declaradas:
   (17) o ranking ordena bem entre decis e mal dentro do decil superior, porque **57,8%
   dos municípios** estão na faixa em que `mun_taxa_alfab_lag1` não discrimina e **os 50 do
@@ -780,41 +787,199 @@ publicado ao lado; a unidade de avaliação precisa ser plurianual ou agrupada.
 
 ---
 
-## Etapa 7 — Documentação e entregáveis `[ ]`
+## Etapa 7 — Documentação e entregáveis `[~]`
 
+Passada de entregável: os três documentos que vão para avaliação foram escritos a partir da
+evidência das seis etapas anteriores, sem recalcular nada e sem citar número que não esteja
+num artefato em disco.
 
-- [ ] README completo — as 11 seções exigidas, sem nenhum "Em construção"
-- [x] `reports/auditoria_camada_gold.md` — evidência da auditoria da Etapa 2.5
-- [ ] `reports/documentacao_tecnica.md` — decisões analíticas detalhadas, incluindo experimentos descartados
-- [ ] `reports/roteiro_video.md` — roteiro do vídeo executivo de 5 min
-- [ ] Revisão final de reprodutibilidade
+### Resultado da Etapa 7
 
-### Seções do README
+**Os três documentos estão escritos e a verificação técnica de reprodutibilidade passou.**
+Falta um item, e ele é decisão do grupo, não tarefa técnica: o repositório Git não contém o
+projeto.
 
-Contexto do problema · Objetivo analítico · Descrição da base (com dicionário de features) · Etapas de modelagem · Escolha do algoritmo (tabela comparativa dos modelos) · Métricas de avaliação · Interpretação dos resultados · Insights encontrados · **Limitações** · Aplicação prática para políticas públicas · Possíveis evoluções futuras
+| Entregável | Estado |
+|---|---|
+| `README.md` — as 11 seções exigidas pelo enunciado | escrito, sem nenhum "Em construção" |
+| `reports/documentacao_tecnica.md` | escrito, 12 seções |
+| `reports/roteiro_video.md` | escrito, cronometrado, com divisão sugerida entre os cinco |
+| `reports/auditoria_camada_gold.md` | já entregue na Etapa 2.5 |
+| Revisão de reprodutibilidade | executada — ver abaixo |
 
-**Limitações a declarar explicitamente** (o avaliador vai procurar por elas):
+**O README declara 20 limitações**, as 16 que o plano vinha acumulando mais as 4 que a Etapa 6
+acrescentou, agrupadas em quatro blocos: sobre a base, sobre o que a base não permite medir,
+sobre o desempenho e sobre os produtos da camada estratégica. As três que limitam o uso dos
+CSV publicados (ordenação frágil dentro do decil superior, AC e DF não avaliados, ausência de
+intervalo de confiança no ranking) estão no bloco final, e não diluídas no meio da lista.
 
-1. Roraima está ausente da base: são 26 UFs, não 27, e 5.547 municípios
-2. Não há nenhuma variável sobre o aluno, como nível socioeconômico, cor/raça, idade, frequência ou histórico escolar. É o que limita o AUC
-3. São apenas 2 anos de histórico, o que inviabiliza validação temporal real e torna frágil qualquer extrapolação
-4. **O modelo supera o baseline de uma variável por pouco**: 0,649 a 0,667 contra 0,654 da taxa municipal isolada, e a EDA mediu 0,660 para `mun_prof_media_lag1` sozinha
-5. 12,6% dos alunos faltaram à prova, com **viés de seleção otimista e quantificado**: a alfabetização entre presentes vai de 53,4% no quintil de menor presença municipal a 74,6% no de maior, ou seja, o problema é subestimado exatamente onde é maior. Os números populacionais são ponderados por `peso_aluno`, o fator oficial de não-resposta do INEP (B2), mas a correção assume MAR: ela **padroniza** o viés e reconcilia com a fonte oficial, não o elimina
-6. **Falácia ecológica**: features municipais aplicadas a decisões individuais descrevem o contexto, não a criança
-7. As metas são determinísticas e derivadas da taxa base, então não são alvo preditivo legítimo (A4)
-8. `id_aluno` não é chave longitudinal, logo não há acompanhamento de coorte possível (A2)
-9. **21% dos alunos de 2024 estão sem histórico de escola e 23,11% sem histórico municipal — e o gap são SP, DF e AC inteiros**, 99,92% dele (B3). A coalescência com o agregado do INEP deixa o residual em 1,91% para as features de nível; as distribucionais seguem cobrindo 76,89%. Toda métrica é reportada estratificada por `tem_historico_municipio`
-10. Municípios pequenos têm métricas instáveis: o desvio da evolução anual é de 23,9pp abaixo de 50 alunos avaliados, contra 11,0pp acima de 200
-11. `alfabetizado` é um corte binário em 743,0 pontos, o que descarta a gradação: um aluno com 742,9 e outro com 400 caem na mesma classe
-12. **A escola não é unidade de análise confiável nesta base.** O desvio da escola em relação ao próprio município não persiste de um ano para o outro (0,009 no total, -0,018 em escolas com 80+ alunos), então o modelo descreve território, não qualidade escolar, e não deve ser usado para ranquear escolas
-13. **A taxa de alfabetização de um município e a sua taxa de presença não são independentes**, o que torna rankings entre UFs de coberturas muito diferentes pouco comparáveis: Santa Catarina tem 70,1% de presença e o Ceará, 98,1%
-14. **79 municípios** têm taxa publicada pelo INEP em 2023 e zero alunos no microdado; o município **5219308** tem 410 alunos em 2023, todos ausentes, e por isso fica fora da Gold e da `dim_municipio` (5.547 municípios contra 5.548 no microdado)
-15. **1.185 alunos** (249 em 2023, 936 em 2024) têm `presenca = 1` e proficiência nula, e receberam `alfabetizado = 0` do ETL. O alvo deles não é desfecho, é registro faltante — saem do treino
-16. **A taxa nacional de 2023 não reconcilia** — ponderada dá 57,45% contra 55,9% publicados, embora no grão UF bata exato. **Pendência**: investigar antes de citar qualquer número nacional de 2023 no vídeo ou no README
+**A documentação técnica registra os nove experimentos descartados** com o número que motivou
+cada descarte, e uma seção própria para as três previsões do plano que a medição negou. Um
+experimento negativo bem medido informa tanto quanto um positivo, e é o que separa o registro
+analítico de um relatório de resultados.
 
-### Roteiro do vídeo (5 min)
+**O roteiro do vídeo assume o enquadramento honesto no bloco 3**, onde diz que o modelo acerta
+pouco no grão da criança e explica por quê, antes de apresentar os produtos municipais. A
+ordem importa: a recomendação final sobre metas de municípios pequenos só se sustenta se a
+plateia já souber o que o modelo é e o que ele não é.
 
-problema (30s) → o que os dados mostram (60s) → o modelo, o que ele consegue e o que não consegue (90s) → municípios de risco e clusters (90s) → como isso vira política pública (30s)
+### Verificação de reprodutibilidade — o que foi conferido
+
+| Checagem | Resultado |
+|---|---|
+| Suíte de testes | **84 passando** em 100 s *(94 em 42 s após a revisão)* |
+| Entry points do pipeline | os 5 módulos `-m` e os 2 scripts têm `__main__` |
+| Importação do pacote | 18 módulos de `src/` importam sem erro |
+| Links do README | 21 caminhos internos, todos existem em disco |
+| Contagem de figuras | 55 PNG em `images/`, distribuídas em 5 subdiretórios |
+| Números do README contra artefatos | conferidos contra `reports/metrics/campeao.json` e `cv_modelos.csv` |
+
+Duas correções saíram da conferência. O R² municipal que este plano registrava como 0,625 e
+0,777 é **0,624 e 0,774** em `campeao.json`; os documentos de entrega usam os valores do
+artefato. E a contagem de figuras, estimada em 56, é 55.
+
+### Revisão de consistência do repositório
+
+Passada de revisão sobre notebooks, docstrings e nomenclatura, com o critério de que o
+repositório é lido por um avaliador que nunca viu o projeto.
+
+**Voz.** O notebook 01 falava em primeira pessoa do singular — "descarto", "mantenho",
+"verifiquei", "eu preciso provar" — enquanto os notebooks 02 a 05 já usavam voz impessoal.
+Ele foi escrito antes da passada de voz da Etapa 3 e ficou para trás. Nove trechos
+reescritos, mais quatro docstrings de `src/eda.py` e uma de `montar_agregados_lag`. O
+projeto inteiro passa agora no mesmo scan.
+
+**Dois erros de narrativa, ambos contra a saída da própria célula.** O notebook 03 afirmava
+R² municipal de 0,625 e 0,777 enquanto a célula duas posições acima imprime 0,6237 e
+0,7743; a divergência havia se propagado para `reports/modelagem.md`, para este plano e
+para a docstring de `strategic.py`. E a síntese do notebook 01 citava 46,9% de não
+atingimento da meta de 2024, contra os **45,7%** que a própria execução imprime. Os dois
+foram corrigidos na origem e em todos os lugares para onde tinham viajado.
+
+**Nomenclatura.** `src/visualization/plots.py` era o único dos quatro módulos de gráfico sem
+sufixo de etapa, e a docstring dele afirmava cobrir "as etapas de engenharia de features em
+diante" — falso, já que cada etapa seguinte tem o seu módulo. Renomeado para
+`plots_features.py`, com a docstring corrigida. O notebook 02 foi reexecutado, e as quatro
+figuras saíram **byte a byte idênticas**, o que confirma que a renomeação não tocou em
+resultado.
+
+**O que foi examinado e não precisou de mudança.** Os 33 módulos têm docstring de módulo
+substancial, e elas explicam o porquê da decisão em vez do que a função faz — que é o
+padrão exigido. A cobertura de docstring em função pública é de 82,7%, e as 36 ausências se
+concentram em `plotar_*` triviais, em `main()` de script e nos métodos de API do sklearn
+(`fit`, `predict_proba`). Os notebooks 02 a 05 estão limpos de ponta a ponta.
+
+**Fica registrado sem correção:** `src/eda.py` é dono da paleta de cores e de 19 funções
+`plotar_*`, e os três módulos de `src/visualization/` importam as constantes de lá. A
+dependência aponta na direção contrária à que a estrutura sugere. Consertar exigiria mover a
+identidade visual para um módulo próprio e reexecutar o notebook 01, que é o mais caro do
+projeto, sem mudar nenhum resultado — custo que não se justifica com a entrega em cima.
+
+### O bloqueio que sobra, e que é decisão do grupo
+
+**O repositório Git não contém o projeto.** São 32 arquivos rastreados — os da Etapa 6, mais
+`README.md`, `PLANO_EXECUCAO.md` e `LICENSE` — contra 69 não rastreados que incluem
+`src/config.py`, `requirements.txt`, `.gitignore`, `tests/` inteiro, os notebooks 01 a 04 e os
+relatórios das Etapas 2.5 a 5.
+
+O efeito prático é que `HEAD` tem `src/modeling/strategic.py` sem o `src/config.py` de que ele
+depende. Um clone limpo não roda, e dois entregáveis explícitos do enunciado — "repositório Git
+completo" e "pipeline reproduzível" — não existem enquanto isso não for resolvido.
+
+Não é falha de execução: as Etapas 0 a 5 foram desenvolvidas sem commit, e a Etapa 6 commitou
+apenas o que ela mesma produziu, para não reivindicar autoria do trabalho anterior. A saída é um
+commit em bloco das etapas anteriores, e quem decide como atribuí-lo é o grupo.
+
+Fica pendente também a identidade Git do repositório, hoje não configurada.
+
+### O que falta para a entrega fechar
+
+1. **Commit em bloco das Etapas 0 a 5**, com a atribuição que o grupo decidir.
+2. **Gravar o vídeo** a partir de `reports/roteiro_video.md`, e montar os slides.
+3. **Decidir se `PLANO_EXECUCAO.md` entra na entrega.** Ele hoje é documento de trabalho, com
+   checkbox e registro de execução. Se entrar, vira relatório narrativo; se não, o README e a
+   documentação técnica já carregam tudo o que um avaliador precisa, e ele fica como histórico
+   interno.
+4. **Publicar a Gold** em Release ou Drive, ou declarar no README que a execução completa depende
+   do CSV fornecido pelo grupo. Hoje o README declara a segunda opção.
+
+---
+
+## Etapa 8 — Revisão científica `[~]`
+
+Retorno de *Evaluation* a *Business Understanding* e *Data Preparation/Modeling*, motivado por
+uma revisão externa. O registro completo, com a tabela problema → correção → evidência, está em
+[`reports/revisao_cientifica.md`](reports/revisao_cientifica.md); aqui fica só o que muda o estado
+deste plano.
+
+### O que foi corrigido
+
+**Três correções mudam o que o projeto pode afirmar**, e nenhuma delas é ajuste cosmético:
+
+1. **A seleção de atributos deixou de tocar a reserva.** O B5 histórico comparava conjuntos sobre
+   a coorte inteira, então os municípios depois chamados de teste participaram de uma decisão de
+   modelagem. O script agora separa a reserva com a seed fixa **antes** de qualquer seleção. Isso
+   corrige o fluxo daqui para a frente e **não** restaura a independência já perdida: o artefato
+   carrega `teste_independente_da_selecao: False`, e os 0,6599 passam a ser resultado exploratório
+   retrospectivo. Recuperar avaliação confirmatória exige amostra não consultada.
+2. **A projeção de metas virou cenário condicional avaliado fora do ajuste.** Prior, suavização,
+   deriva, dispersão e baseline são aprendidos em cinco folds por município e aplicados fora do
+   fold que os gerou. Continua sendo a mesma transição 2023 → 2024: é generalização territorial,
+   não validação de ano futuro, e o nome `backtest` saiu do código, dos CSV e das figuras.
+3. **A projeção passou a respeitar o domínio de uma taxa.** A versão gaussiana publicava 10 pontos
+   acima de 100%, 176 limites inferiores negativos e 2.267 superiores acima de 100%. Com a
+   distribuição de trabalho censurada em 0–100, são **zero** em cada uma das três contagens,
+   conferido no CSV publicado.
+
+**Quatro correções são de linguagem, e valem tanto quanto.** O corte de 119 alunos deixou de ser
+regra de elegibilidade e virou referência de dispersão; a flag `ordenacao_fragil` virou
+`faixa_shap_taxa_municipal`, porque o SHAP achatado de uma variável não julga a ordenação inteira;
+a hipótese sobre histórico escolar ficou marcada como não verificável, já que a chave não permite
+acompanhamento longitudinal; e o roteiro deixou de comparar esforço acumulado com ritmo anual — o
+gap de 15,75 pp até 2030 anualiza em 2,625 pp, e a coluna `gap_mediano_anualizado_pp` agora está no
+CSV do funil para que a comparação não precise ser refeita de cabeça.
+
+### Verificação desta etapa
+
+| Checagem | Resultado |
+|---|---|
+| Suíte de testes | **94 passando** em 42 s, com o aviso conhecido do SHAP |
+| `tests/test_revisao.py` | 9 casos novos, que travam as correções contra regressão |
+| Notebooks 01 a 05 | reexecutados por `scripts/executar_notebooks.py`, sem erro |
+| Figuras | 55 PNG regeneradas; a órfã `10_backtest_metas.png` foi removida |
+| Orquestrador | `--etapa dados` e `--etapa relatorios` executados de ponta a ponta |
+| Insumos | 7 fontes conferidas por SHA-256 contra o manifesto |
+| Domínio da projeção | 0 taxas fora de 0–100 e 0 limites impossíveis em 5.352 linhas |
+
+`--etapa modelos` **não** foi reexecutado, e isso é decisão, não pendência esquecida: ele retreina
+o campeão e substituiria o artefato cujas métricas estão publicadas e conferidas por hash. O
+objetivo da revisão era corrigir o protocolo e a linguagem sem trocar o objeto analisado.
+
+### O que continua aberto, e de quem depende
+
+| Pendência | De quem depende | Critério de fechamento |
+|---|---|---|
+| Confirmação prospectiva | amostra não consultada, fora do grupo | métricas em dados que nenhuma decisão tocou |
+| Dimensão socioeconômica | grupo e professor | fonte integrada e auditada, ou reformulação aceita |
+| Disponibilidade temporal das fontes | calendário de publicação do INEP | data real de publicação por atributo, no contrato temporal |
+| Entrega dos dados à banca | grupo | as sete fontes acessíveis a quem clonar |
+| Vídeo de até cinco minutos | grupo | link acessível e duração verificada |
+| Revisão por outro integrante | grupo | PR real, revisado por quem não escreveu |
+
+Nenhuma delas se fecha escrevendo texto, e por isso nenhuma foi marcada como resolvida.
+
+### Seções do README, como entregues
+
+Contexto do problema · Objetivo analítico · Descrição da base utilizada, com dicionário de
+features · Estrutura do repositório · Etapas de modelagem, com a matriz anti-leakage resumida ·
+Escolha do algoritmo, com a tabela comparativa dos 7 candidatos · Métricas de avaliação, com IC
+por bootstrap de municípios e os dois limiares · Interpretação dos resultados, por família ·
+Insights encontrados, 8 · Limitações, 20 · Aplicação prática para políticas públicas, com os 3
+produtos e uma seção de "como **não** usar" · Possíveis evoluções futuras, 6 · Como reproduzir ·
+Entregáveis.
+
+O desvio consciente em relação ao enunciado está declarado no próprio README: ele pede branches
+e pull requests, e o grupo decidiu em 2026-09-02 trabalhar em uma branch só.
 
 ---
 
@@ -876,9 +1041,9 @@ pytest -q                                  # asserções de dados, vazamento e r
 
 **Entrega**
 
-- [ ] Os 5 notebooks executam de ponta a ponta com "Restart & Run All", no kernel `tc-fase3`
-- [ ] Nenhum notebook depende do Python do sistema
-- [ ] O README declara as 16 limitações, sem nenhuma seção "Em construção"
+- [x] Os 5 notebooks executam de ponta a ponta, sem erro, por `scripts/executar_notebooks.py`
+- [x] Nenhum notebook depende do Python do sistema, nem de kernel registrado com `--user`
+- [x] O README declara as limitações, sem nenhuma seção "Em construção"
 
 ---
 

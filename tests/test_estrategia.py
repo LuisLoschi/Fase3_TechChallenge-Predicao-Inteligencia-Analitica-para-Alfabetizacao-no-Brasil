@@ -196,13 +196,13 @@ def test_criancas_em_risco_e_risco_vezes_populacao(ranking):
 
 
 def test_a_ressalva_da_faixa_achatada_acompanha_a_lista(ranking):
-    """A Etapa 5 mediu a taxa municipal sem poder de ordenação abaixo de 65%."""
+    """Marca um recorte da dependência SHAP, sem julgar a ordenação do modelo."""
     esperado = ranking["mun_taxa_alfab_lag1"].isna() | (
         ranking["mun_taxa_alfab_lag1"] < st.LIMIAR_FAIXA_ACHATADA
     )
-    assert (ranking["ordenacao_fragil"] == esperado).all()
+    assert (ranking["faixa_shap_taxa_municipal"] == esperado).all()
     topo = ranking[ranking["modelo_avaliado"]].nsmallest(50, "posicao_por_taxa")
-    assert topo["ordenacao_fragil"].mean() > 0.5, (
+    assert topo["faixa_shap_taxa_municipal"].mean() > 0.5, (
         "se o topo saísse da faixa achatada, a ressalva perderia o sentido"
     )
 
@@ -271,19 +271,31 @@ def test_a_incerteza_engole_a_meta_na_quase_totalidade_dos_municipios(metas, res
     )
 
 
-def test_o_backtest_ruim_esta_reportado_e_nao_escondido(resumo):
-    """AUC abaixo de 0,55 é o argumento da reformulação, não um resultado a maquiar."""
-    auc = resumo["metas"]["backtest_2023_2024"]["roc_auc"]
-    assert auc["taxa_2023_invertida"] < 0.50, "o preditivo ingênuo é pior que o acaso"
-    assert auc["gap_ate_a_meta_sem_modelo"] < 0.50
-    assert auc["projecao_com_shrinkage_e_deriva"] < 0.60
+def test_validacao_de_metas_tem_baseline_oof_e_incerteza(resumo):
+    validacao = resumo["metas"]["validacao_municipal_2023_2024"]
+    assert validacao["porte_utilizado"] == "n_alunos_2023"
+    assert validacao["n_municipios"] > 4000
+    for item in validacao["intervalos_bootstrap"].values():
+        assert item["ic_baixo"] <= item["pontual"] <= item["ic_alto"]
+    assert 0 <= validacao["cobertura_intervalo_95"] <= 1
 
 
-def test_a_volatilidade_cai_com_o_porte(resumo):
+def test_taxas_e_intervalos_publicados_respeitam_dominio(metas):
+    for coluna in ["taxa_2024_suavizada", "projecao_2025", "intervalo_2025_inferior", "intervalo_2025_superior"]:
+        assert metas[coluna].between(0, 100).all()
+    assert "meta_avaliavel_individualmente" not in metas
+    assert metas["natureza_resultado"].eq("cenario_condicional_sem_validacao_em_ano_futuro").all()
+
+
+def test_a_volatilidade_medida_cai_com_o_porte():
+    """A relação porte → oscilação sobrevive à revisão; o que saiu foi a leitura dela.
+
+    A versão anterior deste teste travava, junto com a monotonia, a afirmação de
+    que existe um "piso irredutível" maior que o esforço pedido pela meta. Essa
+    conclusão foi retirada por extrapolar o que o ajuste mede. A monotonia, não:
+    ela é observação direta das sete faixas e continua sendo o que sustenta a
+    ressalva de porte nos produtos municipais.
+    """
     volatilidade = pd.read_csv(st.CSV_VOLATILIDADE)
     assert volatilidade["evolucao_dp"].is_monotonic_decreasing
-    assert volatilidade["evolucao_dp"].iloc[0] > 20
-    assert volatilidade["evolucao_dp"].iloc[-1] < 10
-    assert resumo["metas"]["persistencia"]["dispersao_c"] > (
-        resumo["metas"]["gap_de_esforco_2025"]["mediana"]
-    ), "o piso irredutível da oscilação anual é maior que o esforço que a meta pede"
+    assert volatilidade["evolucao_dp"].iloc[0] > volatilidade["evolucao_dp"].iloc[-1] * 2

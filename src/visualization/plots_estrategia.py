@@ -313,10 +313,10 @@ def plotar_gap_de_esforco(metas: pd.DataFrame) -> Figure:
 
 
 def plotar_incerteza_por_porte(volatilidade: pd.DataFrame, resumo: dict) -> Figure:
-    """Oscilação anual medida contra a curva ajustada, com o piso irredutível marcado."""
+    """Oscilação anual medida contra a curva ajustada, com o componente constante ajustado marcado."""
     a = resumo["metas"]["persistencia"]["dispersao_a"]
     c = resumo["metas"]["persistencia"]["dispersao_c"]
-    limiar = resumo["metas"]["persistencia"]["limiar_de_porte_para_meta_individual"]
+    limiar = resumo["metas"]["persistencia"]["porte_referencia_dispersao"]
     gap = resumo["metas"]["gap_de_esforco_2025"]["mediana"]
 
     grade = np.logspace(np.log10(10), np.log10(5000), 200)
@@ -326,43 +326,47 @@ def plotar_incerteza_por_porte(volatilidade: pd.DataFrame, resumo: dict) -> Figu
     ax.scatter(volatilidade["porte_mediano"], volatilidade["evolucao_dp"], s=55,
                color=CINZA_ESCURO, zorder=3, label="desvio medido por faixa de porte")
     ax.axhline(c, color=CINZA_MEDIO, linestyle=":", linewidth=1.4)
-    ax.text(11, c + 0.4, f"piso irredutível {c:.1f} pp", fontsize=8, color=CINZA_MEDIO)
+    ax.text(11, c + 0.4, f"componente constante ajustado {c:.1f} pp", fontsize=8, color=CINZA_MEDIO)
     ax.axhline(gap, color=ACENTO_ALERTA, linestyle="--", linewidth=1.4)
     ax.text(11, gap + 0.4, f"esforço mediano exigido pela meta de 2025: {gap:.1f} pp",
             fontsize=8, color=ACENTO_ALERTA)
     ax.axvline(limiar, color=CINZA_ESCURO, linestyle="-.", linewidth=1)
-    ax.text(limiar * 1.08, 24, f"{limiar:.0f} alunos —\nabaixo daqui o ruído domina",
+    ax.text(limiar * 1.08, 24, f"{limiar:.0f} alunos —\nreferência de dispersão, sem corte de elegibilidade",
             fontsize=8, color=CINZA_ESCURO)
     ax.set_xscale("log")
     ax.set_xlabel("alunos avaliados no município (escala log)")
     ax.set_ylabel("desvio-padrão da variação anual (pontos percentuais)")
-    ax.set_title("A meta pede 2 pontos; a oscilação de um ano vale de 9 a 24", loc="left")
+    ax.set_title("Dispersão residual observada e ajuste na transição 2023–2024", loc="left")
     ax.legend(loc="upper right")
     fig.tight_layout()
     return fig
 
 
-def plotar_backtest(backtest: pd.DataFrame, metas: pd.DataFrame, resumo: dict) -> Figure:
-    """Calibração do backtest e a distribuição das probabilidades de 2025.
+def plotar_validacao_metas(validacao: pd.DataFrame, metas: pd.DataFrame, resumo: dict) -> Figure:
+    """Calibração fora do fold e a distribuição das probabilidades de 2025.
 
     Os dois painéis dizem a mesma coisa por caminhos diferentes: à esquerda, a
     previsão quase não separa quem ficou abaixo da meta de quem não ficou; à
     direita, a probabilidade se espalha por toda a faixa, e o que a resume é
     quantos municípios têm a própria meta dentro do intervalo de 95%.
+
+    O painel da esquerda mede a mesma transição 2023 → 2024 em que os
+    parâmetros foram ajustados, com municípios fora do fold. É generalização
+    territorial, não desempenho num ano futuro, e o título diz isso.
     """
-    auc = resumo["metas"]["backtest_2023_2024"]["roc_auc"]["projecao_com_shrinkage_e_deriva"]
+    auc = resumo["metas"]["validacao_municipal_2023_2024"]["roc_auc"]["projecao_com_shrinkage_e_deriva"]
     dentro = resumo["metas"]["share_com_meta_dentro_do_intervalo_de_95"]
 
     fig, eixos = plt.subplots(1, 2, figsize=(12.5, 5))
     eixos[0].plot([0, 1], [0, 1], color=CINZA_MEDIO, linestyle=":", linewidth=1.2,
                   label="calibração perfeita")
-    eixos[0].plot(backtest["probabilidade_prevista"], backtest["fracao_observada"], "o-",
-                  color=ACENTO_ALERTA, linewidth=2, markersize=5, label="decis do backtest")
+    eixos[0].plot(validacao["probabilidade_prevista"], validacao["fracao_observada"], "o-",
+                  color=ACENTO_ALERTA, linewidth=2, markersize=5, label="decis fora do ajuste")
     eixos[0].set_xlim(0.15, 0.75)
     eixos[0].set_ylim(0.15, 0.75)
     eixos[0].set_xlabel("probabilidade prevista de ficar abaixo da meta de 2024")
     eixos[0].set_ylabel("fração que de fato ficou")
-    eixos[0].set_title(f"Backtest 2023 → 2024 — ROC-AUC {auc:.4f}".replace(".", ","), loc="left")
+    eixos[0].set_title(f"OOF por município: 2023 → 2024 — ROC-AUC {auc:.4f}".replace(".", ","), loc="left")
     eixos[0].legend(fontsize=9)
 
     eixos[1].hist(
