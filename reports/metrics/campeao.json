@@ -1,0 +1,191 @@
+{
+  "hiperparametros": {
+    "n_estimators": 883,
+    "num_leaves": 104,
+    "max_depth": 5,
+    "learning_rate": 0.020496381951116718,
+    "min_child_samples": 1126,
+    "subsample": 0.6968221086046001,
+    "colsample_bytree": 0.9633063543866615,
+    "reg_lambda": 9.856504541106007,
+    "subsample_freq": 1,
+    "n_jobs": -1,
+    "verbose": -1
+  },
+  "seed": 42,
+  "hash_dataset": "cc2215565c04d14a5ad97dbfcdda31b5",
+  "n_features_apos_pre_processamento": 89,
+  "desenvolvimento": {
+    "n_alunos": 1521016,
+    "n_municipios": 4413,
+    "prevalencia": 0.40670512341750514,
+    "roc_auc_out_of_fold": 0.6616504377095677
+  },
+  "calibracao": {
+    "brier_bruto": 0.22233110777219978,
+    "brier_calibrado": 0.222444659801676,
+    "ganho_brier": -0.00011355202947621601,
+    "aplicada": false,
+    "criterio": "isotônica ajustada em 4 folds e medida no quinto; aplicada só se o Brier melhorar fora do próprio ajuste"
+  },
+  "teste": {
+    "n_alunos": 330836,
+    "n_municipios": 1104,
+    "publicado": {
+      "roc_auc": 0.6598992919366803,
+      "pr_auc": 0.5359522345050858,
+      "ks": 0.2217852891915803,
+      "brier": 0.21793951022077965,
+      "prevalencia": 0.3812402519677423,
+      "n": 330836
+    },
+    "sem_calibracao": {
+      "roc_auc": 0.6598992919366803,
+      "pr_auc": 0.5359522345050858,
+      "ks": 0.2217852891915803,
+      "brier": 0.21793951022077965,
+      "prevalencia": 0.3812402519677423,
+      "n": 330836
+    },
+    "com_isotonica": {
+      "roc_auc": 0.6598992919366803,
+      "pr_auc": 0.5359522345050858,
+      "ks": 0.2217852891915803,
+      "brier": 0.21817950481359902,
+      "prevalencia": 0.3812402519677423,
+      "n": 330836
+    },
+    "no_limiar": {
+      "limiar": 0.2970692181096789,
+      "recall": 0.8518489153875428,
+      "precisao": 0.4382096711041504,
+      "f1": 0.5787154737794631,
+      "especificidade": 0.3271293745237118,
+      "taxa_de_alerta": 0.7411043538188106,
+      "vp": 107442,
+      "fp": 137742,
+      "fn": 18686,
+      "vn": 66966
+    },
+    "no_limiar_de_capacidade": {
+      "limiar": 0.5251400577175789,
+      "recall": 0.21057972852974755,
+      "precisao": 0.620126079850572,
+      "f1": 0.3143976609571609,
+      "especificidade": 0.9205209371397307,
+      "taxa_de_alerta": 0.12945991367323992,
+      "vp": 26560,
+      "fp": 16270,
+      "fn": 99568,
+      "vn": 188438
+    },
+    "intervalos_bootstrap": [
+      {
+        "metrica": "roc_auc",
+        "pontual": 0.6598992919366803,
+        "ic_baixo": 0.6313681441944995,
+        "ic_alto": 0.6853113435114774,
+        "desvio_bootstrap": 0.014594106200085707,
+        "n_reamostras": 1000
+      },
+      {
+        "metrica": "pr_auc",
+        "pontual": 0.5359522345050858,
+        "ic_baixo": 0.5055984842895602,
+        "ic_alto": 0.5671730356629503,
+        "desvio_bootstrap": 0.01618863668308964,
+        "n_reamostras": 1000
+      },
+      {
+        "metrica": "brier",
+        "pontual": 0.21793951022077965,
+        "ic_baixo": 0.2117441703585529,
+        "ic_alto": 0.22320842653585402,
+        "desvio_bootstrap": 0.0029559276626242408,
+        "n_reamostras": 1000
+      }
+    ],
+    "r2_municipal": [
+      {
+        "porte_minimo": 0,
+        "n_municipios": 1104,
+        "r2": 0.6237351766793608,
+        "correlacao": 0.790353420245105,
+        "vies_medio": -0.005646173415114856
+      },
+      {
+        "porte_minimo": 50,
+        "n_municipios": 865,
+        "r2": 0.7073928286291723,
+        "correlacao": 0.8412143247997643,
+        "vies_medio": -0.002601671990636778
+      },
+      {
+        "porte_minimo": 200,
+        "n_municipios": 355,
+        "r2": 0.774281240861632,
+        "correlacao": 0.8808908159047707,
+        "vies_medio": -0.005079648231254735
+      }
+    ],
+    "capacidade": [
+      {
+        "fracao_atendida": 0.05,
+        "n_atendidos": 16542,
+        "recall": 0.08936160091335786,
+        "precisao": 0.6813565469713456,
+        "lift": 1.7872104098519925
+      },
+      {
+        "fracao_atendida": 0.1,
+        "n_atendidos": 33084,
+        "recall": 0.16799600405936826,
+        "precisao": 0.6404606456293073,
+        "lift": 1.6799397291435487
+      },
+      {
+        "fracao_atendida": 0.2,
+        "n_atendidos": 66167,
+        "recall": 0.3062206647215527,
+        "precisao": 0.5837199812595403,
+        "lift": 1.5311079516045705
+      },
+      {
+        "fracao_atendida": 0.3,
+        "n_atendidos": 99251,
+        "recall": 0.4277242166687809,
+        "precisao": 0.5435511984765896,
+        "lift": 1.4257445158822863
+      },
+      {
+        "fracao_atendida": 0.4,
+        "n_atendidos": 132334,
+        "recall": 0.5364074590891792,
+        "precisao": 0.5112518324844711,
+        "lift": 1.3410227011593976
+      },
+      {
+        "fracao_atendida": 0.5,
+        "n_atendidos": 165418,
+        "recall": 0.6301455664087277,
+        "precisao": 0.48047370902803804,
+        "lift": 1.2602911328174553
+      }
+    ]
+  },
+  "limiar": {
+    "por_f1": 0.2970692181096789,
+    "por_capacidade": 0.5251400577175789,
+    "fracao_de_capacidade": 0.2,
+    "criterio": "ambos escolhidos nos escores out-of-fold do desenvolvimento; o teste não participa de nenhuma decisão"
+  },
+  "segundos": 188.9,
+  "status_validacao": {
+    "natureza": "exploratoria_retrospectiva",
+    "teste_independente_da_selecao": false,
+    "motivo": "B5 e EDA supervisionada históricos consultaram a coorte inteira de 2024.",
+    "validacao_temporal_do_campeao": false,
+    "uso": "análise de contexto; sem diagnóstico individual ou garantia prospectiva",
+    "proximo_gate": "nova amostra não consultada e disponibilidade temporal das fontes documentada"
+  }
+}

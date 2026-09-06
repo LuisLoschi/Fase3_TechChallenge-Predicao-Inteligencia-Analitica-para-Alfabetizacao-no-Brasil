@@ -1,0 +1,78 @@
+# ---------------------------------------------------------------------------
+# Dados — NUNCA versionar
+# ---------------------------------------------------------------------------
+# São ~830 MB de microdados públicos do INEP, reprodutíveis a partir da fonte.
+# Ver data/README.md para como obtê-los/regenerá-los.
+data/raw/
+data/interim/
+data/processed/
+
+# `data/reference/` é a exceção: dimensões pequenas e derivadas, versionadas de
+# propósito para que um clone limpo tenha a dimensão territorial sem reprocessar
+# os 830 MB. Só CSV entra aqui — nada de dado bruto.
+!data/reference/
+!data/reference/*.csv
+
+*.parquet
+*.feather
+
+# ---------------------------------------------------------------------------
+# Modelos e artefatos de treino
+# ---------------------------------------------------------------------------
+models/*
+!models/.gitkeep
+*.joblib
+*.pkl
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+ENV/
+
+# ---------------------------------------------------------------------------
+# Jupyter
+# ---------------------------------------------------------------------------
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# ---------------------------------------------------------------------------
+# Sistema operacional / IDE
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# ---------------------------------------------------------------------------
+# Material do curso
+# ---------------------------------------------------------------------------
+# O enunciado é material da instituição, não produto deste projeto. Fica na
+# máquina de quem trabalha nele; o repositório é público e não o redistribui.
+\[IAST\]*.pdf
+
+# ---------------------------------------------------------------------------
+# Ferramentas locais
+# ---------------------------------------------------------------------------
+.claude/
+.env
+.env.*
+!.env.example
+tmp/
+output/

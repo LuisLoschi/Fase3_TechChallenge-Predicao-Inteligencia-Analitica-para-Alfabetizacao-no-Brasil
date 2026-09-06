@@ -1,0 +1,14 @@
+{
+  "hash_dataset": "cc2215565c04d14a5ad97dbfcdda31b5",
+  "seed_reserva": 42,
+  "seeds_cv": [
+    42
+  ],
+  "folds": 3,
+  "n_alunos": 162354,
+  "n_municipios": 555,
+  "n_linhas_solicitadas": 150000,
+  "escopo": "desenvolvimento",
+  "execucao_completa": true,
+  "ressalva": "A reserva histórica já foi consultada por experimentos anteriores; resultado exploratório."
+}
