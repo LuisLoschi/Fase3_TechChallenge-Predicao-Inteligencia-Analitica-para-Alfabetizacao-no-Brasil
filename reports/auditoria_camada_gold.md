@@ -1,15 +1,22 @@
 # Auditoria da camada Gold
 
-> **Revisão de validade (2026-09-05):** estas medições do classificador são históricas e exploratórias. A seleção supervisionada consultou a coorte inteira; a reserva não é independente dessa seleção. O código corrigido e o protocolo atual estão em [revisao_cientifica.md](revisao_cientifica.md).
+> **Status de validação deste resultado.** As medições do classificador são
+> **retrospectivas e exploratórias**, não confirmatórias. A seleção supervisionada de
+> atributos consultou a coorte inteira de 2024, então a reserva de teste **não é
+> independente** dessa seleção — e trocar a seed do split não a torna independente, porque
+> o que foi consultado foi a coorte, não uma partição dela. O status está fixado em código,
+> em `src/evaluation/protocolo.py`, e viaja junto do modelo em `carregar_campeao()`.
+> Confirmação prospectiva exige uma amostra ainda não consultada e a documentação da
+> disponibilidade temporal das fontes; nenhuma das duas existe hoje. Nada aqui sustenta
+> diagnóstico individual, garantia prospectiva ou conclusão causal.
 
 
-Conduzida antes de a Etapa 3 escrever a primeira linha de código, por dois analistas em
-paralelo e de forma independente. Motivo: a Etapa 3 ia consumir a Gold e o microdado
+Conduzida antes de a engenharia de atributos escrever a primeira linha de código, por dois analistas em
+paralelo e de forma independente. Motivo: a engenharia de atributos ia consumir a Gold e o microdado
 simultaneamente sem que ninguém tivesse provado que a Gold é fiel, nem medido se o
 microdado paga o custo de ser uma segunda fonte.
 
-As decisões que saíram daqui estão no `PLANO_EXECUCAO.md`. Este documento guarda a
-evidência que as sustenta.
+Este documento guarda a evidência que sustenta as decisões tomadas sobre a camada Gold.
 
 ---
 
@@ -67,7 +74,7 @@ gold_2024.percentual_participacao_municipio vs presença de 2023:
     corr = 0,4699 | MAE = 5,196 pp
 ```
 
-Estavam listadas como features no bloco "Metas" da Etapa 3, violando a regra nº 2 da própria
+Estavam listadas como features no bloco "Metas" do desenho inicial, violando a regra nº 2 da própria
 matriz anti-leakage ("todo agregado calculado exclusivamente sobre 2023").
 
 Custo de remover: **+0,0004 de AUC** no modelo completo (0,6574 → 0,6578). A versão
@@ -167,7 +174,7 @@ reamostrando os 1.104 municípios de teste:
 | **B** — A + percentis de proficiência do microdado | 32 | 0,6574 | **+0,0022 [−0,0005; +0,0045]** |
 | **Bp** — B + participação contemporânea de 2024 | 34 | 0,6578 | +0,0026 [−0,0003; +0,0050] |
 
-A afirmação original da Etapa 3 — "o microdado bruto, **não a Gold**, [é] a matéria-prima
+A afirmação original do desenho — "o microdado bruto, **não a Gold**, [é] a matéria-prima
 das melhores features" — é falsa duas vezes:
 
 1. A taxa de presença de 2023 **está na Gold** (`percentual_participacao_municipio` da linha
@@ -181,7 +188,7 @@ evapora no multivariado porque as duas medem a mesma coisa.
 **Ressalva.** O experimento usa um split, um conjunto de hiperparâmetros e um modelo. O
 delta é frágil nos dois sentidos. Antes de cortar os percentis de proficiência do
 `feature_store.py`, replicar com `StratifiedGroupKFold(5)` e 3 seeds — está na checklist da
-Etapa 3. O que **não** depende dessa réplica é a correção da justificativa: a de que o
+desenho inicial. O que **não** depende dessa réplica é a correção da justificativa: a de que o
 microdado era insubstituível para o lag estava errada.
 
 ---

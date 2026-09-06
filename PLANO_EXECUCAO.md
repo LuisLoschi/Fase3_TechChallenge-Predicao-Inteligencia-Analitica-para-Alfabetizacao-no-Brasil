@@ -1,5 +1,3 @@
-> **Atualização 2026-09-05 — retorno CRISP-DM:** este plano registra decisões históricas. A revisão corrigiu o protocolo de seleção e a projeção municipal. Conclusões anteriores sobre teste intocado, escola, imprevisibilidade e corte de porte foram substituídas em [reports/revisao_cientifica.md](reports/revisao_cientifica.md). Pendem validação prospectiva, dimensão socioeconômica e vídeo.
-
 # Plano de Execução — Tech Challenge Fase 3
 
 > Documento vivo de acompanhamento. Cada etapa é marcada como concluída conforme a execução avança.
@@ -693,8 +691,9 @@ decil superior por volume concentra **67,2%** das 837 mil crianças em risco do 
 O agrupamento devolveu três perfis, e o de maior risco reúne 2.142 municípios e
 **66,9%** dessas crianças. Em **97,5% dos municípios a meta de 2025 cai dentro do
 intervalo de 95% da própria projeção**. Testes: de 63 para **84**, os 21 novos em
-`tests/test_estrategia.py`. Notebook com 15 células de código executadas no kernel
-`tc-fase3` e 11 gráficos em `images/estrategia/`.
+`tests/test_estrategia.py`. Notebook com **12** células de código executadas no kernel
+`tc-fase3` e 11 gráficos em `images/estrategia/`. *(Eram 15 antes de a revisão reescrever o
+notebook 05 a partir de `scripts/atualizar_relatorios.py`.)*
 
 | Entrega | Número que a fecha |
 |---|---|
@@ -703,8 +702,15 @@ intervalo de 95% da própria projeção**. Testes: de 63 para **84**, os 21 novo
 | Ranking por volume | 242,7 mil crianças, 29,0% do total; São Paulo é o 1.766º por intensidade |
 | Clusterização | `k = 3`, silhueta 0,2487; grupo de risco com 2.142 municípios e 66,9% das crianças |
 | Gap de esforço 2025 | mediana +2,24 pp; 43,4% já superam a meta |
-| Projeção 2025 | IC95 de 55,7 pp de largura; só 134 municípios ficam fora dele |
-| Backtest 2023→2024 | ROC-AUC 0,5445; preditores ingênuos em 0,4876 e 0,4916 |
+| Projeção 2025 | IC95 de **52,0 pp** de largura; **132** municípios ficam fora dele |
+| Validação 2023→2024 *(não é backtest)* | ROC-AUC **0,5455** [0,5283; 0,5631]; preditores ingênuos em 0,4876 e 0,4916 |
+
+> **Como ler estes dois números.** Ambos vêm de `reports/metrics/estrategia_resumo.json`,
+> com a distribuição de trabalho censurada em 0–100 e a avaliação feita fora do fold que
+> ajustou os parâmetros. O ROC-AUC vem acompanhado do intervalo de bootstrap, que **cruza o
+> acaso na borda inferior**: a projeção separa pouco. E a medição é generalização territorial
+> dentro da transição 2023 → 2024, não teste em ano futuro — parâmetros e desfecho vêm da
+> mesma transição.
 
 **Cinco decisões e achados que contrariam ou refinam o que este plano previa:**
 
@@ -733,11 +739,19 @@ intervalo de 95% da própria projeção**. Testes: de 63 para **84**, os 21 novo
    presença entrou como gradiente colado ao desempenho, de 88,3% no grupo de risco a
    96,9% no consolidado. O terceiro grupo se chama "risco alto e cobertura menor", e não
    "com baixa participação", por causa disso.
-5. **O limiar de porte para meta individual é 119 alunos, não "cerca de 50".** O ponto em
-   que `a²/n = c²` no ajuste `sd(n) = √(a²/n + c²)` marca 119, e são **51,6% dos municípios
-   com meta publicada e 52,3% da coorte inteira**. O `k` da mistura de credibilidade dá 55 pelo caminho
-   independente. A faixa entre 55 e 119 é onde a avaliação individual começa a fazer
-   sentido; abaixo de 55 ela não faz nenhum.
+5. **O porte de referência da dispersão é 129 alunos, não "cerca de 50".** O ponto em
+   que `a²/n = c²` no ajuste `sd(n) = √(a²/n + c²)` marca **129**, e **54,3%** dos municípios
+   com meta publicada ficam abaixo dele. Pelo caminho independente, a mistura de credibilidade
+   sobre a taxa observada dá `k` de **55,1 alunos** (`estrategia_shrinkage.csv`, inalterado pela
+   revisão); a suavização de persistência do modelo de metas, que é outro objeto, dá `k` de
+   **9,1** (`estrategia_resumo.json`, `k_shrinkage`). São três medidas de "porte a partir do
+   qual o número do município é estável", e elas **não convergem** — o que já é o recado.
+
+   > **O que este corte não é.** Ele descreve a curva de dispersão ajustada — onde o erro
+   > amostral deixa de dominar o ruído irredutível — e nada mais. Não identifica causas da
+   > variação, não determina quando um município pode ser avaliado individualmente e **não
+   > deve restringir acesso a política pública**. A coluna `porte_abaixo_referencia_dispersao`
+   > no CSV é descritiva.
 
 **Confirmado como previsto:** o backtest ingênuo reproduziu o diagnóstico quase exato —
 0,4876 ordenando pela taxa de 2023 invertida e 0,4916 pelo gap até a meta, contra os
@@ -746,13 +760,21 @@ cai com o porte de 24,19 pp abaixo de 25 alunos para 8,77 pp acima de mil; e a
 reconciliação entre a taxa publicada pelo INEP e a ponderada do projeto fica em
 MAE 0,81 pp.
 
-**O achado que a política pública leva.** A pergunta 4 devolveu a medida da própria
-imprevisibilidade, e ela é o produto: as metas são individualizadas a partir da taxa
+**O achado que a política pública leva.** As metas são individualizadas a partir da taxa
 base do município, com `corr(meta_2025, taxa_2023) = 0,9765`, então a distância até a
 meta carrega pouca informação estrutural. O intervalo de 95% da projeção tem largura
-mediana de **55,7 pp** e engole a meta em 5.218 dos 5.352 municípios. Municípios abaixo
-de 119 alunos avaliados não deveriam ter metas avaliadas individualmente sem intervalo
-publicado ao lado; a unidade de avaliação precisa ser plurianual ou agrupada.
+mediana de **52,0 pp** e engole a meta em **5.220 dos 5.352** municípios. Um intervalo
+dessa largura significa que o cenário publicado **não separa** um município que vai
+cumprir a meta de um que não vai: qualquer uso do número precisa levar o intervalo na
+mesma linha, e a unidade de avaliação ganha em ser plurianual ou agrupada.
+
+> **Duas ressalvas sobre o alcance desta leitura.** *(a)* O que foi medido é que **os métodos
+> testados aqui** discriminam pouco nesta transição — ROC-AUC 0,5455 com IC95 [0,5283; 0,5631]
+> e ganho de Brier sobre o baseline de +0,0014 com IC95 [−0,0016; +0,0043], que **inclui
+> zero**. Isso limita o que estes métodos conseguem; não prova que a trajetória municipal seja
+> imprevisível em geral. *(b)* O corte de porte é descrição de dispersão, não critério de
+> acesso a política: não existe regra de elegibilidade dizendo que municípios pequenos não
+> devem ter metas avaliadas.
 
 ### O que a Etapa 7 recebe
 
@@ -796,27 +818,23 @@ num artefato em disco.
 ### Resultado da Etapa 7
 
 **Os três documentos estão escritos e a verificação técnica de reprodutibilidade passou.**
-Falta um item, e ele é decisão do grupo, não tarefa técnica: o repositório Git não contém o
-projeto.
 
 | Entregável | Estado |
 |---|---|
 | `README.md` — as 11 seções exigidas pelo enunciado | escrito, sem nenhum "Em construção" |
-| `reports/documentacao_tecnica.md` | escrito, 12 seções |
+| `reports/documentacao_tecnica.md` | escrito, **9 seções**, com os experimentos descartados e as previsões que a medição negou |
 | `reports/roteiro_video.md` | escrito, cronometrado, com divisão sugerida entre os cinco |
 | `reports/auditoria_camada_gold.md` | já entregue na Etapa 2.5 |
 | Revisão de reprodutibilidade | executada — ver abaixo |
 
-**O README declara 20 limitações**, as 16 que o plano vinha acumulando mais as 4 que a Etapa 6
-acrescentou, agrupadas em quatro blocos: sobre a base, sobre o que a base não permite medir,
-sobre o desempenho e sobre os produtos da camada estratégica. As três que limitam o uso dos
-CSV publicados (ordenação frágil dentro do decil superior, AC e DF não avaliados, ausência de
-intervalo de confiança no ranking) estão no bloco final, e não diluídas no meio da lista.
-
-**A documentação técnica registra os nove experimentos descartados** com o número que motivou
-cada descarte, e uma seção própria para as três previsões do plano que a medição negou. Um
-experimento negativo bem medido informa tanto quanto um positivo, e é o que separa o registro
-analítico de um relatório de resultados.
+**Onde estão as ressalvas.** As limitações que importam para o
+uso dos CSV publicados — faixa de SHAP achatada no decil superior, AC e DF fora da
+clusterização, ausência de intervalo de confiança no ranking — estão em
+`reports/aplicacao_estrategica.md`, na mesma linha do resultado a que se aplicam, que é onde
+elas efetivamente protegem quem lê. Os experimentos negativos bem medidos estão em
+`reports/documentacao_tecnica.md`, com o número que motivou cada descarte, e nos relatórios de
+engenharia de atributos e de modelagem. Um experimento negativo informa tanto quanto um
+positivo, e é o que separa o registro analítico de um relatório de resultados.
 
 **O roteiro do vídeo assume o enquadramento honesto no bloco 3**, onde diz que o modelo acerta
 pouco no grão da criança e explica por quê, antes de apresentar os produtos municipais. A
@@ -827,7 +845,7 @@ plateia já souber o que o modelo é e o que ele não é.
 
 | Checagem | Resultado |
 |---|---|
-| Suíte de testes | **84 passando** em 100 s *(94 em 42 s após a revisão)* |
+| Suíte de testes | **95 passando** em 50 s |
 | Entry points do pipeline | os 5 módulos `-m` e os 2 scripts têm `__main__` |
 | Importação do pacote | 18 módulos de `src/` importam sem erro |
 | Links do README | 21 caminhos internos, todos existem em disco |
@@ -875,46 +893,28 @@ dependência aponta na direção contrária à que a estrutura sugere. Consertar
 identidade visual para um módulo próprio e reexecutar o notebook 01, que é o mais caro do
 projeto, sem mudar nenhum resultado — custo que não se justifica com a entrega em cima.
 
-### O bloqueio que sobra, e que é decisão do grupo
-
-**O repositório Git não contém o projeto.** São 32 arquivos rastreados — os da Etapa 6, mais
-`README.md`, `PLANO_EXECUCAO.md` e `LICENSE` — contra 69 não rastreados que incluem
-`src/config.py`, `requirements.txt`, `.gitignore`, `tests/` inteiro, os notebooks 01 a 04 e os
-relatórios das Etapas 2.5 a 5.
-
-O efeito prático é que `HEAD` tem `src/modeling/strategic.py` sem o `src/config.py` de que ele
-depende. Um clone limpo não roda, e dois entregáveis explícitos do enunciado — "repositório Git
-completo" e "pipeline reproduzível" — não existem enquanto isso não for resolvido.
-
-Não é falha de execução: as Etapas 0 a 5 foram desenvolvidas sem commit, e a Etapa 6 commitou
-apenas o que ela mesma produziu, para não reivindicar autoria do trabalho anterior. A saída é um
-commit em bloco das etapas anteriores, e quem decide como atribuí-lo é o grupo.
-
-Fica pendente também a identidade Git do repositório, hoje não configurada.
-
 ### O que falta para a entrega fechar
 
-1. **Commit em bloco das Etapas 0 a 5**, com a atribuição que o grupo decidir.
-2. **Gravar o vídeo** a partir de `reports/roteiro_video.md`, e montar os slides.
-3. **Decidir se `PLANO_EXECUCAO.md` entra na entrega.** Ele hoje é documento de trabalho, com
-   checkbox e registro de execução. Se entrar, vira relatório narrativo; se não, o README e a
-   documentação técnica já carregam tudo o que um avaliador precisa, e ele fica como histórico
-   interno.
-4. **Publicar a Gold** em Release ou Drive, ou declarar no README que a execução completa depende
-   do CSV fornecido pelo grupo. Hoje o README declara a segunda opção.
+1. **Gravar o vídeo** a partir de `reports/roteiro_video.md`, e montar os slides.
+2. **Resolver a dimensão socioeconômica**, integrando uma fonte auditada ou alinhando o recorte
+   com o professor. É a única divergência aberta em relação ao objetivo do enunciado.
+3. **Publicar a Gold** em Release ou Drive, ou manter a declaração do README de que a execução
+   completa depende do CSV fornecido pelo grupo. Hoje o README declara a segunda opção, e o
+   `data/manifesto_fontes.json` confere a versão de cada uma das sete fontes.
 
 ---
 
-## Etapa 8 — Revisão científica `[~]`
+## Etapa 8 — Revisão de validade `[~]`
 
-Retorno de *Evaluation* a *Business Understanding* e *Data Preparation/Modeling*, motivado por
-uma revisão externa. O registro completo, com a tabela problema → correção → evidência, está em
-[`reports/revisao_cientifica.md`](reports/revisao_cientifica.md); aqui fica só o que muda o estado
-deste plano.
+Retorno de *Evaluation* a *Business Understanding* e *Data Preparation/Modeling*. É o passo do
+CRISP-DM que existe para perguntar se o que se mediu sustenta o que se afirma — e aqui ele mudou
+três afirmações do projeto. A tabela problema → decisão → evidência está em
+[`reports/limites_de_validade.md`](reports/limites_de_validade.md); esta seção registra o efeito
+sobre o estado do projeto.
 
-### O que foi corrigido
+### O que mudou no que o projeto pode afirmar
 
-**Três correções mudam o que o projeto pode afirmar**, e nenhuma delas é ajuste cosmético:
+**Três decisões de protocolo**, e nenhuma delas é ajuste cosmético:
 
 1. **A seleção de atributos deixou de tocar a reserva.** O B5 histórico comparava conjuntos sobre
    a coorte inteira, então os municípios depois chamados de teste participaram de uma decisão de
@@ -931,8 +931,10 @@ deste plano.
    distribuição de trabalho censurada em 0–100, são **zero** em cada uma das três contagens,
    conferido no CSV publicado.
 
-**Quatro correções são de linguagem, e valem tanto quanto.** O corte de 119 alunos deixou de ser
-regra de elegibilidade e virou referência de dispersão; a flag `ordenacao_fragil` virou
+**Quatro correções são de linguagem, e valem tanto quanto.** O corte de porte deixou de ser
+regra de elegibilidade e virou referência de dispersão — e no caminho o próprio valor mudou, de
+119 para **129 alunos**, porque a censura da distribuição em 0–100 alterou o ajuste de `a` e `c`
+(`estrategia_resumo.json`, `porte_referencia_dispersao`); a flag `ordenacao_fragil` virou
 `faixa_shap_taxa_municipal`, porque o SHAP achatado de uma variável não julga a ordenação inteira;
 a hipótese sobre histórico escolar ficou marcada como não verificável, já que a chave não permite
 acompanhamento longitudinal; e o roteiro deixou de comparar esforço acumulado com ritmo anual — o
@@ -943,8 +945,8 @@ CSV do funil para que a comparação não precise ser refeita de cabeça.
 
 | Checagem | Resultado |
 |---|---|
-| Suíte de testes | **94 passando** em 42 s, com o aviso conhecido do SHAP |
-| `tests/test_revisao.py` | 9 casos novos, que travam as correções contra regressão |
+| Suíte de testes | **95 passando** em 50 s, com o aviso conhecido do SHAP |
+| `tests/test_protocolo.py` | 10 casos que travam essas garantias contra regressão |
 | Notebooks 01 a 05 | reexecutados por `scripts/executar_notebooks.py`, sem erro |
 | Figuras | 55 PNG regeneradas; a órfã `10_backtest_metas.png` foi removida |
 | Orquestrador | `--etapa dados` e `--etapa relatorios` executados de ponta a ponta |
@@ -964,19 +966,16 @@ objetivo da revisão era corrigir o protocolo e a linguagem sem trocar o objeto 
 | Disponibilidade temporal das fontes | calendário de publicação do INEP | data real de publicação por atributo, no contrato temporal |
 | Entrega dos dados à banca | grupo | as sete fontes acessíveis a quem clonar |
 | Vídeo de até cinco minutos | grupo | link acessível e duração verificada |
-| Revisão por outro integrante | grupo | PR real, revisado por quem não escreveu |
 
 Nenhuma delas se fecha escrevendo texto, e por isso nenhuma foi marcada como resolvida.
 
 ### Seções do README, como entregues
 
-Contexto do problema · Objetivo analítico · Descrição da base utilizada, com dicionário de
-features · Estrutura do repositório · Etapas de modelagem, com a matriz anti-leakage resumida ·
-Escolha do algoritmo, com a tabela comparativa dos 7 candidatos · Métricas de avaliação, com IC
-por bootstrap de municípios e os dois limiares · Interpretação dos resultados, por família ·
-Insights encontrados, 8 · Limitações, 20 · Aplicação prática para políticas públicas, com os 3
-produtos e uma seção de "como **não** usar" · Possíveis evoluções futuras, 6 · Como reproduzir ·
-Entregáveis.
+Contexto do problema · Objetivo analítico · Descrição da base utilizada · Etapas de modelagem ·
+Escolha do algoritmo · Métricas de avaliação, com IC por bootstrap de municípios e os dois
+limiares · Interpretação dos resultados, por família · Insights encontrados, 4 · Aplicação
+prática para políticas públicas, com os 3 produtos e o limite de cada um · Limitações do projeto ·
+Possíveis evoluções futuras · Estrutura do repositório · Como reproduzir · Entregáveis.
 
 O desvio consciente em relação ao enunciado está declarado no próprio README: ele pede branches
 e pull requests, e o grupo decidiu em 2026-09-02 trabalhar em uma branch só.
@@ -985,10 +984,10 @@ e pull requests, e o grupo decidiu em 2026-09-02 trabalhar em uma branch só.
 
 ## Git workflow
 
-**Decisão do grupo (2026-09-02): tudo na branch atual, sem branch por etapa.** O plano
-previa sete branches com PR; ficou em uma só. O histórico de decisões analíticas passa a
-depender inteiramente das mensagens de commit — commits pequenos e descritivos, um por
-bloco de decisão, já que não haverá PRs para contar essa história.
+**Decisão do grupo: sem branch por etapa.** O plano previa sete branches com PR; o trabalho
+ficou concentrado em `main` e `develop`. O histórico de decisões analíticas depende, portanto,
+das mensagens de commit — commits pequenos e descritivos, um por bloco de decisão, já que não
+há uma sequência de PRs para contar essa história.
 
 ---
 
@@ -999,7 +998,7 @@ Tudo deve rodar do zero num clone limpo:
 ```bash
 python -m venv .venv && source .venv/Scripts/activate   # PowerShell: .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-python -m ipykernel install --user --name tc-fase3      # kernel do venv, exigido pelos notebooks
+python scripts/verificar_insumos.py         # confere as 7 fontes por SHA-256
 python scripts/prepare_data.py             # CSV para Parquet em data/interim/
 python scripts/build_dim_municipio.py      # dimensão territorial em data/reference/
 python -m src.preprocessing.build_dataset  # gera data/processed/dataset_2024.parquet
@@ -1009,6 +1008,8 @@ python -m src.modeling.train campeao       # refit, teste, models/campeao.joblib
 python -m src.evaluation.rigor             # permutacao, curva, LOGO, drift, invariancia
 python -m src.evaluation.interpret         # SHAP, permutacao, familias -> interpret_*
 python -m src.modeling.strategic           # escore OOF nacional + os 3 CSVs de reports/
+python scripts/atualizar_relatorios.py     # reescreve os números dos documentos
+python scripts/executar_notebooks.py notebooks/*.ipynb   # saídas e figuras dos notebooks
 pytest -q                                  # asserções de dados, vazamento e reprodutibilidade
 ```
 
@@ -1059,4 +1060,4 @@ pytest -q                                  # asserções de dados, vazamento e r
 | Escopo grande para o prazo | A ordem das etapas é a ordem de prioridade: 1 a 4 entregam o mínimo exigido, 5 a 7 agregam valor |
 | Notebook rodar fora do venv sem ninguém notar | Kernel `tc-fase3` registrado e fixado no `kernelspec` de cada notebook; a Etapa 2 já pegou esse erro uma vez |
 | ~~Interpretar importância de feature colineares como achado~~ | **Resolvido** — a leitura por família foi feita e o viés que ela corrige foi medido: embaralhar a família municipal junta derruba 1,61 vez mais que a soma das colunas isoladas, e 1,90 vez na territorial |
-| Origem da Gold num clone limpo | **Em aberto.** O CSV tem 615 MB, é gitignored, e o ETL que o gera está em `scripts/etl/` mas depende de um workspace Databricks. Decidir entre publicar o arquivo ou declarar a dependência no README |
+| Origem da Gold num clone limpo | O CSV tem 615 MB, é gitignored, e o ETL que o gera está em `scripts/etl/` mas depende de um workspace Databricks. O README declara a dependência e `data/manifesto_fontes.json` confere a versão das sete fontes; entregar os arquivos a quem for avaliar continua sendo tarefa do grupo |

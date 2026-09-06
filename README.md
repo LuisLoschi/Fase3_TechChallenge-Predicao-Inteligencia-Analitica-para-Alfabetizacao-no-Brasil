@@ -2,10 +2,15 @@
 
 Grupo: Eduardo Rossi | Luis Loschi | Luiza Santos | Vitória Santos | Vyctor Correia
 
-**Estado: revisado, com resultados exploratórios e pendências acadêmicas.**
-CRISP-DM: Evaluation após retorno a preparação/modelagem. O classificador estima
-risco contextual individual; a aplicação municipal apresenta rankings, perfis e cenários.
-Leia [correções e gates](reports/revisao_cientifica.md) e [guia de execução](GUIA_DE_EXECUCAO.md).
+**Resultados exploratórios e retrospectivos, com as limitações declaradas em texto e em código.**
+O classificador estima risco contextual individual; a aplicação municipal entrega rankings,
+perfis e cenários. Comece pelas [limitações do projeto](#limitações-do-projeto) e pelo
+[guia de execução](GUIA_DE_EXECUCAO.md).
+
+> **Status de validação, em uma linha:** a seleção supervisionada de atributos consultou a
+> coorte inteira de 2024, então a reserva de teste **não é independente** dessa seleção e
+> nenhum número aqui é confirmação prospectiva. O status está fixado em
+> `src/evaluation/protocolo.py` e acompanha o modelo em `carregar_campeao()`.
 
 ## Contexto do problema
 
@@ -41,9 +46,11 @@ retirados registros sem medida válida e excluídos proficiência contemporânea
 e participação da própria prova dos preditores. Os pesos são usados nas agregações populacionais.
 
 `ColumnTransformer` integra imputação, escala e encoding ao modelo. O ajuste usa apenas
-o treino de cada fold. A reserva histórica contém municípios diferentes dos do desenvolvimento.
-**A seleção histórica de atributos, porém, consultou toda a coorte:** as métricas não são
-uma avaliação confirmatória independente. O B5 corrigido opera só no desenvolvimento.
+o treino de cada fold. A reserva contém municípios diferentes dos do desenvolvimento.
+**A seleção de atributos, porém, consultou toda a coorte:** as métricas não são uma
+avaliação confirmatória independente. A ablação em `scripts/experimento_b5.py` separa a
+reserva antes de qualquer seleção, o que preserva a partição para decisões futuras sem
+tornar independente o resultado já publicado.
 
 ## Escolha do algoritmo
 
@@ -103,17 +110,43 @@ O ganho de Brier sobre prevalência do treino inclui zero no intervalo.
 
 ## Limitações do projeto
 
-Seleção histórica com participação do teste; ausência de validação temporal do classificador
-completo; calendário de publicação não auditado; ausência de dimensão socioeconômica;
-viés de cobertura e não resposta; chaves escolares recicladas; extrapolação de apenas uma transição;
-ausência de avaliação causal e de incerteza das posições municipais.
-As probabilidades de metas são condicionais à distribuição adotada e não garantem resultados em 2025.
+**Sobre a validade do que foi medido.** A seleção supervisionada de atributos consultou a coorte
+inteira de 2024: a reserva de teste não é independente dessa seleção, e trocar a seed do split
+não a torna independente. Não há validação temporal do classificador completo — features de lag
+para 2023 exigiriam 2022, que não existe —, e a única checagem out-of-time possível usa um modelo
+reduzido a UF, região e rede. Toda métrica publicada é retrospectiva e exploratória.
+
+**Sobre o que a base não contém.** Não há nenhuma variável sobre a criança: nível socioeconômico,
+cor/raça, idade, frequência ou histórico escolar. O modelo é territorial, e atribuir a uma criança
+a característica do seu município é falácia ecológica. As chaves de escola são recicladas entre
+edições, o que impede acompanhamento longitudinal e torna **não verificável** — não negativa — a
+pergunta sobre o valor do histórico escolar. Roraima não está na base. O calendário de publicação
+das fontes não foi auditado.
+
+**Sobre quem entra na medição.** Só alunos presentes com medida válida. Ausência não é sinônimo de
+não alfabetização, e a taxa municipal de um território com baixa presença é otimista; a ponderação
+por `peso_aluno` corrige não resposta sob hipóteses que não são verificáveis aqui. O modelo regride
+para a média e subestima o risco justamente onde ele é maior.
+
+**Sobre os produtos municipais.** Não há intervalo de confiança em torno do risco de cada
+município, nem validação temporal do ranking: com duas edições da prova não existe um 2025 contra
+o qual conferir a ordenação de 2024. A incerteza das posições não foi quantificada em nenhum
+produto. Os cenários de metas são **condicionais** à distribuição adotada — normal censurada em
+0–100, uma decisão deste projeto e não uma garantia dada por biblioteca — e não garantem
+resultados em 2025; a validação deles é territorial, na mesma transição 2023 → 2024, e não é teste
+de ano futuro. O porte de referência da dispersão é descritivo e **não** é regra de elegibilidade:
+não deve restringir acesso de município nenhum a política pública. Nada no projeto sustenta
+conclusão causal.
 
 ## Possíveis evoluções futuras
 
-Obter amostra não consultada, confirmar disponibilidade das fontes, integrar informação
-socioeconômica pertinente, medir estabilidade do ranking e pactuar capacidade/custos com gestores.
-Novos algoritmos e tuning adicional não são a prioridade antes desses pontos.
+Três gates estão abertos e dependem de coisas que não se resolvem escrevendo texto: **uma amostra
+ainda não consultada**, sem a qual não há confirmação prospectiva; a **documentação da
+disponibilidade temporal** de cada fonte, que é o que autorizaria uso prospectivo; e a **integração
+de uma dimensão socioeconômica**, hoje ausente por falta de fonte integrada. Depois deles vêm medir
+a estabilidade do ranking e pactuar capacidade e custo com gestores. Novos algoritmos e tuning
+adicional não são a prioridade antes desses pontos — o ganho do modelo sobre uma regra de uma
+variável é de 0,027 de ROC-AUC, e o teto não está no algoritmo.
 
 ## Estrutura do repositório
 
@@ -142,7 +175,8 @@ o manifesto confere a versão, mas não substitui o fornecimento. Veja o guia pa
 
 ## Entregáveis
 
-Código, notebooks, métricas, figuras, documentação técnica, contrato temporal, revisão científica
-e [roteiro executivo](reports/roteiro_video.md). **A gravação do vídeo ainda não foi verificada.**
-O repositório local deve ser publicado e submetido à revisão real do grupo;
-nenhum histórico de colaboração ou aceite acadêmico é presumido.
+Código, notebooks, métricas, figuras, [documentação técnica](reports/documentacao_tecnica.md),
+[limites de validade](reports/limites_de_validade.md), [contrato temporal](reports/contrato_temporal.md)
+e [roteiro executivo](reports/roteiro_video.md).
+A execução completa depende dos sete CSVs de origem, que não são versionados; o
+[manifesto SHA-256](data/manifesto_fontes.json) confere a versão de cada um.

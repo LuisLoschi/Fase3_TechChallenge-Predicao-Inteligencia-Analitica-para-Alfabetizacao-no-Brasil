@@ -1,8 +1,7 @@
-# Roteiro executivo — versão revisada
+# Roteiro executivo
 
 **CRISP-DM: comunicação de Evaluation.** Público: gestores educacionais.
-Duração planejada: 4min a 4min40, a confirmar por ensaio e gravação.
-Gravação e link ainda pendentes. Os tempos abaixo são planejamento, não duração medida.
+Duração planejada: 4min a 4min40. Os tempos abaixo são planejamento, não duração medida.
 
 ## 0:00–0:40 — A decisão
 
@@ -45,7 +44,7 @@ planejamento; não devem definir automaticamente quais municípios receberão re
 
 A distância até a meta de 2025 é diretamente calculável: meta menos taxa de 2024.
 O gap mediano é 2,2 pontos percentuais.
-Também construímos cenários com incerteza. Corrigimos a avaliação para que cada município
+Também construímos cenários com incerteza. A avaliação é montada para que cada município
 seja previsto por parâmetros ajustados em outros municípios, e todas as taxas e limites
 ficam entre zero e cem por cento.
 
@@ -64,16 +63,16 @@ Nossa recomendação é usar os produtos para priorizar análises locais, verifi
 da prova e discutir capacidade de atendimento. Municípios pequenos precisam de contexto
 e incerteza, sem um corte automático de elegibilidade baseado em tamanho.
 
-A revisão também identificou que a seleção histórica de atributos consultou o conjunto
-depois usado como teste. Corrigimos o fluxo, mas os resultados antigos continuam
-exploratórios. O próximo passo é obter uma amostra ainda não consultada, confirmar quando
-cada dado estava disponível e integrar a dimensão socioeconômica prevista no desafio.
+Vale dizer o que ainda não sabemos. A seleção de atributos consultou o mesmo conjunto que
+depois serviu de reserva, então nenhum número aqui é confirmação prospectiva. O próximo
+passo é uma amostra ainda não consultada, a confirmação de quando cada dado estava
+disponível e a integração da dimensão socioeconômica prevista no desafio.
 
 A entrega organiza evidências para decisão e torna explícito o que ainda precisa ser
 validado. Esse cuidado é parte do valor do projeto para o planejamento educacional.
 
 ## Slides e ensaio
 
-Usar os gráficos de comparação, duas ordenações e validação municipal atualizados.
-`images/estrategia/10_validacao_metas.png` substitui o gráfico antigo, rotulado como backtest.
-Ensaiar, cortar exemplos se necessário e conferir duração final de no máximo cinco minutos.
+Usar os gráficos de comparação, as duas ordenações e a validação municipal —
+`images/estrategia/10_validacao_metas.png`. Ensaiar, cortar exemplos se necessário e
+conferir duração final de no máximo cinco minutos.

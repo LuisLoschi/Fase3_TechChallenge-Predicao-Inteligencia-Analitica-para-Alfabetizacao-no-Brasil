@@ -1,17 +1,25 @@
-# Engenharia de features — evidência da Etapa 3
+# Engenharia de features — a evidência
 
-> **Revisão de validade (2026-09-05):** estas medições do classificador são históricas e exploratórias. A seleção supervisionada consultou a coorte inteira; a reserva não é independente dessa seleção. O código corrigido e o protocolo atual estão em [revisao_cientifica.md](revisao_cientifica.md).
+> **Status de validação deste resultado.** As medições do classificador são
+> **retrospectivas e exploratórias**, não confirmatórias. A seleção supervisionada de
+> atributos consultou a coorte inteira de 2024, então a reserva de teste **não é
+> independente** dessa seleção — e trocar a seed do split não a torna independente, porque
+> o que foi consultado foi a coorte, não uma partição dela. O status está fixado em código,
+> em `src/evaluation/protocolo.py`, e viaja junto do modelo em `carregar_campeao()`.
+> Confirmação prospectiva exige uma amostra ainda não consultada e a documentação da
+> disponibilidade temporal das fontes; nenhuma das duas existe hoje. Nada aqui sustenta
+> diagnóstico individual, garantia prospectiva ou conclusão causal.
 
 
-O `PLANO_EXECUCAO.md` guarda as decisões; este documento guarda a medição que as
-sustenta, no mesmo formato da auditoria da Etapa 2.5. Tudo aqui foi medido sobre
+Este documento guarda a medição que sustenta cada decisão de atributo, no mesmo
+formato da auditoria da camada Gold. Tudo aqui foi medido sobre
 as bases do projeto nesta etapa — nada foi herdado sem reconferir.
 
 Fase CRISP-DM 3, *Data Preparation*. Entregáveis: dataset versionado, catálogo de
 features e código de preparação reproduzível.
 
 **Resumo em quatro linhas.** O dataset tem 1.851.852 alunos de 2024 e 41 colunas,
-das quais **20 entram no modelo**. Dois blocos previstos pelo plano foram
+das quais **20 entram no modelo**. Dois blocos candidatos foram
 construídos, medidos e deixados de fora: o de escola, porque `id_escola` é
 reciclado entre edições e o join entrega a 76% dos alunos o histórico de outra
 escola; e o de percentis de proficiência do microdado, porque a réplica do
@@ -86,7 +94,7 @@ de ROC-AUC em 15 folds (seção 8).
 
 **Decisão.** O bloco `esc_*` sai de `FEATURES_MODELO` e vira controle negativo
 declarado, ao lado do `caderno`, disponível em `pipeline.FEATURES_ESCOLA`. Se
-receber importância relevante no SHAP da Etapa 5, isso é detector de sobreajuste,
+receber importância relevante no SHAP da interpretabilidade, isso é detector de sobreajuste,
 não achado sobre escolas.
 
 **O que isso corrige na EDA.** Os itens 8, 12 e 16 do notebook 01 mediram
@@ -245,7 +253,7 @@ e 0,240 dentro de `X`, contra o limite de 0,95 da checklist. Porte e dispersão 
 `mun_n_alunos_lag1` em 0,4765 e `mun_prof_sd_lag1` em 0,4844, e não sustentariam
 nada sozinhos. E o `caderno`, controle negativo do desenho, marca 0,5013 — que é
 exatamente o que se espera de um caderno randomizado, e o valor de referência
-contra o qual a importância dele será lida na Etapa 5.
+contra o qual a importância dele é lida na interpretabilidade.
 
 **As metas confirmam A4 sobre a nova base.** `mun_meta_2024_lag1` correlaciona
 0,9685 com a taxa municipal ponderada de 2023 e 0,6315 com a de 2024;
@@ -316,7 +324,7 @@ estão travadas por teste.
 **Indicadores de nulo redundantes.** Os 12 indicadores gerados colapsam em **5**
 padrões distintos de nulidade. Foram mantidos porque `add_indicator=True` é a
 defesa correta contra uma coluna futura cuja nulidade *não* esteja em bloco, mas
-a Etapa 5 precisa lê-los como família: colunas idênticas dividem a importância
+a interpretabilidade precisa lê-los como família: colunas idênticas dividem a importância
 entre si e fazem a nulidade parecer irrelevante quando ela não é.
 
 ---
@@ -365,14 +373,14 @@ de `mun_media_portugues_lag1`, que mede a mesma distribuição e fica no conjunt
 é exatamente o mecanismo que a auditoria havia identificado, o de que a vantagem
 univariada evapora no multivariado porque as duas medem a mesma coisa. Elas
 faltam precisamente para SP, DF e AC, agravando a redundância de indicadores da
-seção 6. E correlacionam acima de 0,95 com colunas que ficam, o que na Etapa 5
+seção 6. E correlacionam acima de 0,95 com colunas que ficam, o que na interpretabilidade
 diluiria a importância da família municipal entre sinônimos.
 
 O que a decisão **não** significa: o microdado continua sendo fonte obrigatória
 do projeto, por `peso_aluno` e por `presenca` em grão de escola e de município. O
 que sai é o único bloco que só ele produz, não a dependência.
 
-As colunas continuam construídas e gravadas no dataset. Se a Etapa 4 quiser
+As colunas continuam construídas e gravadas no dataset. Se a modelagem quiser
 reabrir a questão com os hiperparâmetros do campeão, é uma linha:
 `FEATURES_MODELO + FEATURES_PERCENTIS_MICRODADO`.
 
@@ -380,7 +388,7 @@ reabrir a questão com os hiperparâmetros do campeão, é uma linha:
 de AUC e 4 folds a favor em 15. Um bloco de nove colunas que custa métrica é a
 definição de ruído com custo de manutenção.
 
-**Uma leitura que a Etapa 4 vai precisar.** Os três conjuntos ficam em 0,659 de
+**Uma leitura de que a modelagem precisa.** Os três conjuntos ficam em 0,659 de
 ROC-AUC com desvio de 0,013 entre folds, dentro da expectativa de 0,65 ± 0,03 do
 diagnóstico. Nesse patamar, o que separa um modelo do outro não vai ser lista de
 features — e é preciso comparar contra o baseline de uma variável com o **mesmo**
@@ -415,7 +423,7 @@ desenho de validação antes de afirmar qualquer superioridade.
 
 ---
 
-## 10. O que fica para a Etapa 4
+## 10. O que fica para a modelagem
 
 1. **Estratificar toda métrica** por `tem_historico_municipio` e por
    `fonte_lag_municipal`. Os três estratos têm AUC univariada entre 0,347 e 0,453
@@ -423,14 +431,14 @@ desenho de validação antes de afirmar qualquer superioridade.
 2. **Comparar contra o baseline de uma variável no mesmo desenho de validação.**
    O conjunto completo entrega 0,6589 em CV agrupada; `mun_media_portugues_lag1`
    sozinha entrega 0,6411 em AUC univariada sobre a coorte inteira. Os dois
-   números não são comparáveis como estão, e a Etapa 4 precisa medir os dois no
+   números não são comparáveis como estão, e a modelagem precisa medir os dois no
    mesmo `StratifiedGroupKFold` antes de dizer quanto o modelo agrega.
 3. **AC e DF entram sem lag de UF nenhum.** Vale medir o desempenho nesses dois
    territórios separadamente antes de publicar qualquer ranking que os inclua.
 4. **`FEATURES_PODADAS` com `indicador_de_nulo=False`** é obrigatório no baseline
    linear; o conjunto completo é singular.
 5. **Dois controles negativos, não um.** `caderno` (AUC 0,5013) e o bloco `esc_*`
-   são o par que a Etapa 5 usa como detector de sobreajuste. Se qualquer um dos
+   são o par que a interpretabilidade usa como detector de sobreajuste. Se qualquer um dos
    dois aparecer alto no SHAP, o alarme é do modelo, não da educação básica.
 6. O dataset tem 1.851.852 linhas e 41 colunas: 20 features, 5 do bloco de
    percentis, 9 do bloco de escola, 3 operacionais (`id_municipio`, `peso_aluno`,
@@ -438,6 +446,14 @@ desenho de validação antes de afirmar qualquer superioridade.
    territorial e `uf_n_alunos_lag1`, insumos de diagnóstico que ficam fora do
    modelo porque porte de UF não discrimina aluno.
 
-## Execução corrigida
+## O protocolo da ablação, e o que ele não alcança
 
-O script atual reserva os municípios antes de amostrar e comparar atributos. Produz `experimento_b5_desenvolvimento.csv` e manifesto JSON. A execução de verificação usa ~150 mil linhas, uma seed e três folds. O CSV `experimento_b5_replica.csv` acima permanece histórico e não representa o protocolo corrigido.
+`scripts/experimento_b5.py` reserva os municípios de teste antes de amostrar e comparar
+atributos, com a seed fixa do projeto; as seeds do argumento alteram apenas a validação
+cruzada. Produz `experimento_b5_desenvolvimento.csv` e um manifesto JSON com escopo, seed da
+reserva e hash do dataset. A execução de verificação usa ~150 mil linhas, uma seed e três folds.
+
+O `experimento_b5_replica.csv` citado acima é a medição que efetivamente decidiu o conjunto de
+atributos, e ela comparou os conjuntos sobre a coorte inteira. É por isso que a reserva não é
+independente da seleção, e é por isso que as métricas do classificador são exploratórias. A
+separação prévia protege decisões futuras; não recupera a independência deste resultado.

@@ -1,7 +1,9 @@
-# Aplicação estratégica — revisão científica
+# Aplicação estratégica
 
-**CRISP-DM: Evaluation.** Entregável: respostas às cinco perguntas do PDF, com revisão de validade.
-Decisão: manter análise retrospectiva e cenários condicionais; uso prospectivo operacional depende de nova validação.
+**CRISP-DM: Evaluation.** As cinco perguntas do desafio, respondidas na unidade de decisão
+em que a política pública acontece: o município. O classificador sustenta análise
+retrospectiva de território; os cenários de metas são condicionais. Uso prospectivo
+operacional depende de validação que este trabalho não tem.
 
 ## 1. Quais fatores estão associados à alfabetização?
 
@@ -118,6 +120,6 @@ sem identificação do desfecho dos ausentes.
 
 `python -m src.modeling.strategic` seguido de `python scripts/atualizar_relatorios.py`.
 `estrategia_metas_oof.csv` registra município e fold; `estrategia_validacao_metas.csv`, os decis.
-O resumo anterior está em `reports/metrics/historico/` para rastreabilidade.
-O modelo individual continua histórico e exploratório; veja `revisao_cientifica.md`.
+O modelo individual é retrospectivo e exploratório: a reserva de teste foi consultada na seleção
+de atributos, e o status está fixado em `src/evaluation/protocolo.py`.
 Não há validação temporal completa, dados socioeconômicos, avaliação causal ou incerteza das posições.

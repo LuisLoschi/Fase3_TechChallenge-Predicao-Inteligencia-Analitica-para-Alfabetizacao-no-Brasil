@@ -43,4 +43,4 @@ O caderno é da prova de 2024 e só cabe no artefato retrospectivo até comprova
 Não foi identificado atributo socioeconômico. O enunciado menciona essa dimensão;
 a lacuna permanece até integração de fonte adequada ou alinhamento acadêmico do recorte.
 Não se supõe aceite do professor. Sem nova amostra intocada, não há gate de validação
-confirmatória. As análises atuais são exploratórias mesmo após corrigir o código.
+confirmatória. As análises deste trabalho são exploratórias.

@@ -1,10 +1,18 @@
-# Modelagem supervisionada — evidência da Etapa 4
+# Modelagem supervisionada — a evidência
 
-> **Revisão de validade (2026-09-05):** estas medições do classificador são históricas e exploratórias. A seleção supervisionada consultou a coorte inteira; a reserva não é independente dessa seleção. O código corrigido e o protocolo atual estão em [revisao_cientifica.md](revisao_cientifica.md).
+> **Status de validação deste resultado.** As medições do classificador são
+> **retrospectivas e exploratórias**, não confirmatórias. A seleção supervisionada de
+> atributos consultou a coorte inteira de 2024, então a reserva de teste **não é
+> independente** dessa seleção — e trocar a seed do split não a torna independente, porque
+> o que foi consultado foi a coorte, não uma partição dela. O status está fixado em código,
+> em `src/evaluation/protocolo.py`, e viaja junto do modelo em `carregar_campeao()`.
+> Confirmação prospectiva exige uma amostra ainda não consultada e a documentação da
+> disponibilidade temporal das fontes; nenhuma das duas existe hoje. Nada aqui sustenta
+> diagnóstico individual, garantia prospectiva ou conclusão causal.
 
 
-O `PLANO_EXECUCAO.md` guarda as decisões; este documento guarda a medição que as
-sustenta, no mesmo formato da auditoria da Etapa 2.5 e do relatório da Etapa 3.
+Este documento guarda a medição que sustenta cada decisão de modelagem, no mesmo
+formato da auditoria da camada Gold e do relatório de engenharia de atributos.
 Tudo aqui foi medido sobre o dataset de 1.851.852 alunos de 2024, com
 `RANDOM_STATE = 42`, `scikit-learn 1.8.0` e `lightgbm 4.7.0`.
 
@@ -52,7 +60,7 @@ teste, e um PR-AUC de 0,54 significa coisas diferentes contra 0,40 e contra 0,38
 ## 2. A barra real: 0,6337, não 0,654
 
 O diagnóstico media ROC-AUC 0,654 para "ranquear os alunos pela taxa de
-alfabetização de 2023 do seu município", e a Etapa 3 registrou a ressalva de que
+alfabetização de 2023 do seu município", e a engenharia de atributos registrou a ressalva de que
 aquele número vinha de outro esquema de validação. Reimplementada como estimador
 `sklearn` e passada pelos **mesmos cinco folds** dos candidatos, a mesma regra vale:
 
@@ -93,7 +101,7 @@ quanto o território determina o destino individual, e isso tem teto.
 
 **Floresta e boosting empatam; o desempate é custo.** O delta pareado é de −0,0002
 com IC cruzando o zero e p = 0,78. A floresta leva 89 segundos por fold contra 17
-do boosting, e o LightGBM tem `TreeExplainer` exato para a Etapa 5. O campeão é o
+do boosting, e o LightGBM tem `TreeExplainer` exato para a interpretabilidade. O campeão é o
 LightGBM por custo e por ferramental, não por vencer — e isso vai declarado.
 
 **A logística podada chega a 0,6513 com oito colunas.** A distância para o campeão,
@@ -150,7 +158,7 @@ indivíduo — folhas pequenas aqui decoram território.
 
 ## 4. A calibração foi testada e rejeitada
 
-A calibração importa porque as probabilidades viram, na Etapa 6, o ranking
+A calibração importa porque as probabilidades viram, na aplicação estratégica, o ranking
 municipal de risco — `risco_municipal` é a média das probabilidades preditas dentro
 do município. Um viés distribuído de forma desigual entre territórios reordena o
 topo da lista, que é a parte que decide orçamento.
@@ -248,7 +256,7 @@ escores se acumulam e onde a informação municipal não distingue mais nada.
 
 ## 7. A estratificação obrigatória — o agregado esconde três populações
 
-A Etapa 3 deixou isto como contrato, e a medição confirma que era necessário.
+A engenharia de atributos deixou isto como contrato, e a medição confirma que era necessário.
 
 ### Por fonte do lag municipal (B4)
 
@@ -276,7 +284,7 @@ se valesse.
 | **AC e DF, sem lag de UF em fonte nenhuma** | **1.200** | **0,5173** |
 
 **Acre e Distrito Federal são ruído.** Nenhuma fonte de 2023 os cobre e o modelo não
-tem o que dizer sobre eles. Qualquer ranking da Etapa 6 precisa marcá-los como não
+tem o que dizer sobre eles. Qualquer ranking municipal precisa marcá-los como não
 avaliados, não posicioná-los.
 
 ### Por quintil de taxa de presença municipal em 2023
@@ -329,7 +337,7 @@ cancela o ruído individual:
 Isto responde ao desconforto da seção 2. A AUC de 0,66 no aluno e o R² de 0,78 no
 município não se contradizem: são a mesma informação em dois grãos. **O território
 explica bem o território e explica mal a criança** — o que é, em si, o achado de
-política pública desta entrega, e o que sustenta a camada estratégica da Etapa 6.
+política pública desta entrega, e o que sustenta a camada estratégica municipal.
 
 O viés médio negativo em todas as faixas significa que o modelo **subestima**
 levemente o risco. É pequeno, mas soma-se ao viés de seleção dos ausentes na mesma
@@ -366,7 +374,7 @@ busca de hiperparâmetros e 883 árvores estão, em 99,5% da sua capacidade
 discriminante, reproduzindo uma média por município.
 
 Isso não invalida o modelo: reforça o enquadramento. O objeto que esta base permite
-construir é um **medidor de risco territorial**, e a Etapa 6 está certa em levar o
+construir é um **medidor de risco territorial**, e a aplicação estratégica está certa em levar o
 resultado para o grão municipal. O que ele não é, e não pode ser vendido como, é um
 identificador de crianças em risco dentro de uma mesma escola ou de um mesmo
 município.
@@ -479,7 +487,7 @@ todas as colunas seria indistinguível de um teste quebrado.
 | Dataset | `data/processed/dataset_2024.parquet`, MD5 gravado dentro de `campeao.json` e do `joblib` |
 | Artefato | `models/campeao.joblib` — modelo, dois limiares, nomes das 89 colunas pós-`ColumnTransformer`, seed, hash e versões |
 | Versões | `scikit-learn 1.8.0`, `lightgbm 4.7.0`, Python 3.14.3 |
-| Escores out-of-fold | `models/escores_oof_desenvolvimento.parquet`, prontos para o ranking municipal da Etapa 6 |
+| Escores out-of-fold | `models/escores_oof_desenvolvimento.parquet`, prontos para o ranking municipal |
 | Testes | `tests/test_modelagem.py`, 10 casos, incluindo a reprodução do ROC-AUC publicado a partir do artefato em disco |
 
 O teste `test_campeao_em_disco_reproduz_as_metricas_publicadas` escora o conjunto
@@ -488,7 +496,7 @@ lugar onde uma divergência entre o número do relatório e o do modelo aparecer
 
 ---
 
-## 11. O que a Etapa 5 recebe, e com quais ressalvas
+## 11. O que a interpretabilidade recebe, e com quais ressalvas
 
 **Pronto para consumo:** `models/campeao.joblib` com o `ModeloCalibrado`, que
 recebe a linha como ela sai do Parquet de modelagem e devolve

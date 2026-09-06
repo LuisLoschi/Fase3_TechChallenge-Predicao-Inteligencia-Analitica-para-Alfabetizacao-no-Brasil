@@ -3,9 +3,9 @@
 Este documento é o mapa operacional do projeto: o que cada arquivo faz, em que ordem as coisas
 rodam, o que cada comando lê e escreve, e por que aquele passo existe. O [README](README.md)
 apresenta o problema e os resultados; aqui está como reproduzi-los. Antes de citar qualquer número
-deste projeto, leia os limites em [`reports/revisao_cientifica.md`](reports/revisao_cientifica.md):
-os resultados do classificador são retrospectivos e exploratórios, e os produtos municipais são
-cenários condicionais.
+deste projeto, leia as [limitações](README.md#limitações-do-projeto): os resultados do
+classificador são retrospectivos e exploratórios, a reserva de teste não é independente da
+seleção de atributos, e os produtos municipais são cenários condicionais.
 
 ---
 
@@ -14,8 +14,7 @@ cenários condicionais.
 Três caminhos, conforme o tempo disponível. Todos partem do mesmo lugar.
 
 **Você tem 10 minutos e quer avaliar o projeto.** Leia o [README](README.md) até a seção de
-Limitações, depois [`reports/revisao_cientifica.md`](reports/revisao_cientifica.md), que lista as
-correções aplicadas e as pendências que dependem de terceiros. Em seguida abra
+Limitações, que traz o status de validação e os três gates abertos. Em seguida abra
 [`reports/aplicacao_estrategica.md`](reports/aplicacao_estrategica.md) na seção 5, que é onde estão
 os dois rankings municipais. Não é preciso executar nada — todo número citado tem o artefato
 correspondente versionado em [`reports/`](reports).
@@ -23,8 +22,8 @@ correspondente versionado em [`reports/`](reports).
 **Você tem uma hora e quer entender as decisões.** Leia os notebooks na ordem, de 01 a 05. Eles
 narram a análise com as saídas já gravadas e não precisam ser executados. Cada um abre com uma
 tabela de "pergunta → decisão que ela fecha", e cada achado é numerado. Depois vá para
-[`reports/documentacao_tecnica.md`](reports/documentacao_tecnica.md), em especial a seção 9, dos
-experimentos descartados.
+[`reports/documentacao_tecnica.md`](reports/documentacao_tecnica.md), em especial as seções
+"Experimentos descartados" e "Resultados que contrariam a expectativa inicial".
 
 **Você vai executar.** Siga este guia da próxima seção em diante. Reserve cerca de duas horas de
 processamento, quase todo ele concentrado em dois comandos. Quem quiser só a sequência, sem a
@@ -212,11 +211,12 @@ bloco de escola acrescenta algo depois de descoberta a reciclagem de `id_escola`
 conjuntos nos mesmos folds, com hiperparâmetros fixos, para que a diferença medida seja de
 atributos e não de tuning.
 
-**A correção que este passo carrega.** A réplica histórica comparava conjuntos sobre a coorte
-inteira de 2024: os municípios depois chamados de reserva participaram de uma decisão de modelagem.
-Esta versão separa a reserva com a seed fixa do projeto **antes** de qualquer seleção, e as seeds do
-argumento alteram apenas a validação cruzada. Isso corrige o fluxo para decisões futuras e não
-restaura a independência da reserva já consultada — para isso é preciso uma amostra ainda não usada.
+**O limite que este passo carrega.** A medição que efetivamente decidiu o conjunto de atributos
+comparou os conjuntos sobre a coorte inteira de 2024, então os municípios da reserva participaram
+de uma decisão de modelagem. O script separa a reserva com a seed fixa do projeto **antes** de
+qualquer seleção, e as seeds do argumento alteram apenas a validação cruzada — o que protege
+decisões futuras sem tornar independente a reserva já consultada. Para isso é preciso uma amostra
+ainda não usada.
 
 **Escreve** `reports/metrics/experimento_b5_desenvolvimento.csv` e o JSON irmão, que registra
 escopo, seed da reserva, hash do dataset e a ressalva. A saída histórica fica preservada em
@@ -299,8 +299,9 @@ Aceita estágios: `oof`, `risco`, `clusters`, `metas` ou `tudo` (padrão).
 **Como a projeção de metas é avaliada.** Prior, suavização, deriva, dispersão e baseline são
 aprendidos em cinco folds por município e aplicados fora do fold que os gerou. É generalização
 territorial dentro da transição 2023 → 2024, não validação de um ano futuro: os parâmetros e o
-desfecho vêm da mesma transição. A distribuição de trabalho é censurada em 0–100, porque a versão
-gaussiana anterior publicava taxas acima de 100% e limites inferiores negativos.
+desfecho vêm da mesma transição. A distribuição de trabalho é censurada em 0–100, porque uma
+formulação gaussiana livre publica taxas acima de 100% e limites inferiores negativos, que não são
+valores possíveis para uma taxa.
 
 **Escreve** os três CSVs publicáveis em `reports/`, dez arquivos `reports/metrics/estrategia_*`,
 `models/escores_oof_nacional.parquet` e o sidecar `escores_oof_nacional.json`, que guarda hash do
@@ -351,10 +352,10 @@ Colunas de ressalva que acompanham o resultado, e o que cada uma quer dizer:
 | `porte_abaixo_referencia_dispersao` | projeção | porte abaixo da referência usada para modelar dispersão; é descrição, não regra de elegibilidade |
 | `taxa_presenca_2024` | ambos | a cobertura sobre a qual o número foi calculado |
 
-A coluna `faixa_shap_taxa_municipal` mudou de nome nesta revisão. Ela se chamava `ordenacao_fragil`,
-e o nome antigo afirmava mais do que a medição sustentava: o SHAP achatado de **uma** variável
-abaixo de 65% não estabelece que a ordenação do modelo inteiro seja frágil naquele recorte, porque
-os demais atributos continuam contribuindo. Medir o ranking dentro dessa faixa é trabalho pendente.
+O nome de `faixa_shap_taxa_municipal` é deliberadamente estreito. Ela marca o recorte em que a
+contribuição SHAP da taxa municipal se achata, e nada além disso: o SHAP achatado de **uma**
+variável não estabelece que a ordenação do modelo inteiro seja frágil ali, porque os demais
+atributos continuam contribuindo. Medir o ranking dentro dessa faixa é trabalho pendente.
 
 ### Os relatórios de evidência
 
@@ -368,21 +369,30 @@ Um por etapa, e é neles que estão os números que o README resume.
 | [`reports/modelagem.md`](reports/modelagem.md) | os 7 candidatos, a reserva e as provas de rigor |
 | [`reports/interpretabilidade.md`](reports/interpretabilidade.md) | SHAP, permutação e a leitura por família |
 | [`reports/aplicacao_estrategica.md`](reports/aplicacao_estrategica.md) | as cinco perguntas de negócio |
-| [`reports/documentacao_tecnica.md`](reports/documentacao_tecnica.md) | decisões e experimentos descartados |
-| [`reports/revisao_cientifica.md`](reports/revisao_cientifica.md) | o que foi corrigido nesta revisão e o que ainda depende de terceiros |
+| [`reports/documentacao_tecnica.md`](reports/documentacao_tecnica.md) | os 15 experimentos descartados e os resultados que contrariaram a expectativa |
+| [`reports/limites_de_validade.md`](reports/limites_de_validade.md) | o que as medições sustentam, as decisões de protocolo e o que continua aberto |
 | [`reports/roteiro_video.md`](reports/roteiro_video.md) | o roteiro do vídeo executivo |
 
-Leia [`revisao_cientifica.md`](reports/revisao_cientifica.md) junto com qualquer um dos outros. Ele
-é a tabela de correções e, principalmente, a lista de gates que **não** foram fechados: amostra nova
-para confirmação prospectiva, dimensão socioeconômica, entrega dos dados à banca, gravação do vídeo
-e revisão real por outro integrante do grupo.
+Leia qualquer um deles junto com as [limitações do README](README.md#limitações-do-projeto), que
+reúnem o status de validação e os gates que **não** foram fechados: amostra nova para confirmação
+prospectiva, disponibilidade temporal das fontes e dimensão socioeconômica.
 
 ### Métricas e artefatos
 
-`reports/metrics/` guarda 38 arquivos, todos gerados por comando e nenhum editado a mão. O prefixo
-diz a origem: `experimento_b5_` vem do passo 4, `cv_` e `tuning_` dos passos 5 e 6, `campeao_` do 7,
-`rigor_` do 8, `interpret_` do 9 e `estrategia_` do 10. `historico/` guarda as saídas anteriores à
-revisão, mantidas como registro do que foi feito e não como evidência corrente.
+`reports/metrics/` guarda 38 arquivos. O prefixo diz a origem: `experimento_b5_` vem do passo 4,
+`cv_` e `tuning_` dos passos 5 e 6, `campeao_` do 7, `rigor_` do 8, `interpret_` do 9 e
+`estrategia_` do 10. `historico/` guarda saídas superadas, mantidas para rastreabilidade e não
+como evidência corrente.
+
+**Trinta e seis desses arquivos são saída direta do comando da sua etapa. Dois não são:**
+`campeao.json` e `interpret_resumo.json` receberam **edição manual** para gravar o status de
+validação e o veredito de H2 sem retreinar o campeão — a decisão de congelar o artefato está
+descrita na seção de reprodutibilidade de
+[`interpretabilidade.md`](reports/interpretabilidade.md). O conteúdo
+dos dois confere com o que `src/modeling/campeao.py` e `src/evaluation/interpret.py` produziriam
+hoje, mas a ordem das chaves e o mtime denunciam a edição, e é assim que deve ser: quem auditar
+precisa conseguir ver que aqueles dois arquivos não vieram de uma execução. Rodar de novo os passos
+7 e 9 os regenera na ordem canônica e apaga essa distinção.
 
 `models/` guarda o artefato serializado, os escores out-of-fold e o sidecar JSON de proveniência do
 cache. Não é versionado.
@@ -440,13 +450,12 @@ regenerá-las é só reexecutar os notebooks, sem refazer conta nenhuma.
 │   │   └── interpret.py        passo 9
 │   └── visualization/          gráficos por etapa
 │
-├── tests/                      94 testes; ver a seção abaixo
+├── tests/                      95 testes; ver a seção abaixo
 ├── images/                     55 figuras
 ├── reports/                    relatórios, produtos e métricas
 │
 ├── README.md                   o problema, os resultados e as limitações
 ├── GUIA_DE_EXECUCAO.md         este arquivo
-├── PLANO_EXECUCAO.md           o registro de decisão etapa a etapa
 └── requirements.txt
 ```
 
@@ -472,7 +481,7 @@ Leia na ordem. Cada um abre com a tabela de perguntas que ele fecha e numera os 
 | [`04_interpretabilidade.ipynb`](notebooks/04_interpretabilidade.ipynb) | 5, *Evaluation* | a importância por família e o que passa do piso de ruído |
 | [`05_aplicacao_estrategica.ipynb`](notebooks/05_aplicacao_estrategica.ipynb) | 5 → 6, *Deployment* | as cinco perguntas de negócio |
 
-Todos os cinco estão executados nesta revisão, sem erro e com as saídas gravadas. Para reexecutar,
+Todos os cinco estão executados, sem erro e com as saídas gravadas. Para reexecutar,
 rode na ordem — o notebook 03 em diante lê artefatos que os passos 5 a 10 precisam ter escrito
 antes:
 
@@ -488,7 +497,7 @@ Abrir no Jupyter continua funcionando; aí sim é preciso o kernel `tc-fase3`.
 ## Os testes
 
 ```bash
-pytest -q                       # 94 testes, cerca de 42 s
+pytest -q                       # 95 testes, cerca de 42 s
 pytest -q tests/test_dados.py   # só a integridade das bases
 ```
 
@@ -501,9 +510,9 @@ Eles não testam se o código roda. Testam se as decisões continuam válidas.
 | `test_modelagem.py` | 10 | que o artefato em disco reproduz o ROC-AUC publicado, conferido contra o hash do dataset real |
 | `test_interpretabilidade.py` | 12 | que o SHAP soma exatamente a predição, e o mapa de 89 colunas para 5 famílias |
 | `test_estrategia.py` | 22 | que o escore é out-of-fold, e que o CSV de metas não contém rótulo binário |
-| `test_revisao.py` | 9 | as correções desta revisão: reserva separada antes da seleção, projeção dentro de 0–100, e o artefato carregando o limite da validação |
+| `test_protocolo.py` | 10 | reserva separada antes da seleção, projeção dentro de 0–100, e o carregador anexando o limite da validação |
 
-`test_revisao.py` existe para que as correções não sejam desfeitas em silêncio. Ele trava, entre
+`test_protocolo.py` existe para que essas garantias não sejam afrouxadas em silêncio. Ele trava, entre
 outras coisas, que o desfecho de um fold não influencia as próprias predições, que a projeção
 recusa entradas inválidas e permanece coerente nas bordas do domínio, e que o carregador do modelo
 devolve `teste_independente_da_selecao: False` em vez de omitir a ressalva.

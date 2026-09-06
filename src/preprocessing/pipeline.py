@@ -12,8 +12,9 @@ Três decisões medidas nesta etapa e materializadas aqui:
 1. **O bloco `esc_*` não entra no conjunto padrão.** `id_escola` é reatribuído a
    cada edição: dos 36.051 identificadores presentes nos dois anos, 2,40% caem no
    mesmo município. Dar a cada escola de 2024 a taxa de uma escola **sorteada da
-   mesma UF** rende AUC 0,5722, *acima* dos 0,5581 do join real; sortear de
-   qualquer UF derruba para 0,5002. Todo o sinal aparente do bloco é sinal de UF.
+   mesma UF** rende AUC 0,5601 ± 0,0006 em três seeds, *acima* dos 0,5581 do join
+   real; sortear de qualquer UF derruba para 0,4998, o acaso exato. Todo o sinal
+   aparente do bloco é sinal de UF.
    Ele fica disponível em `FEATURES_ESCOLA` para a ablação e o controle negativo
    da Etapa 5, não no conjunto de produção.
 2. **`min_frequency` só no `caderno`.** O plano previa
@@ -22,9 +23,22 @@ Três decisões medidas nesta etapa e materializadas aqui:
    SE, TO, AP e AC — 4 UFs com 10 a 18 mil alunos cada — em um único nível
    "infrequent", justamente na variável de 49pp de amplitude. O limiar vale para
    o `caderno`; para o resto basta `handle_unknown="infrequent_if_exist"`.
-3. **Os percentis de proficiência do microdado também ficam de fora.** A réplica
-   do experimento B5, com `StratifiedGroupKFold(5)` e 3 seeds, mediu +0,00037 de
-   ROC-AUC para eles, com IC95 pareado incluindo zero. Ver
+3. **Os percentis de proficiência do microdado também ficam de fora.** As duas
+   medições do experimento B5 concordam em que o ganho é compatível com zero, e é
+   por isso que a decisão se mantém:
+
+   - réplica histórica, `StratifiedGroupKFold(5)` e 3 seeds: **+0,00037** de
+     ROC-AUC. Este número **não é evidência válida** — a réplica comparou os
+     conjuntos de atributos sobre a coorte inteira de 2024, então os municípios
+     depois chamados de reserva participaram da decisão. Fica como registro do
+     que foi feito, não como medida de generalização;
+   - execução corrigida, reserva separada **antes** da amostragem, 1 seed e 3
+     folds só no desenvolvimento: **+0,00135**, com desvio de 0,00276 entre folds
+     — ou seja, o ganho é o dobro do desvio abaixo de zero e também não se separa
+     do acaso.
+
+   Ver `scripts/experimento_b5.py`, `experimento_b5_replica.csv` (histórico) e
+   `experimento_b5_desenvolvimento.csv` (corrente), e a constante
    `FEATURES_PERCENTIS_MICRODADO`.
 4. **`FEATURES_PODADAS` para o baseline linear.** No conjunto completo a matriz é
    singular por construção (`iqr = p75 - p25`, `mun_desvio_vs_uf = mun - uf`). O

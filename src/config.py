@@ -140,7 +140,8 @@ COLS_AUDITORIA = (
 # a ponderação padroniza o viés, não o elimina.
 COL_PESO = "peso_aluno"
 
-# Nunca podem entrar como preditor. Ver a matriz anti-leakage do PLANO_EXECUCAO.md.
+# Nunca podem entrar como preditor. Ver a matriz anti-vazamento em
+# reports/documentacao_tecnica.md, seção "Preparação e prevenção de vazamento".
 COLS_PROIBIDAS = (
     "proficiencia",        # é o alvo reescrito (corte em 743,0)
     "peso_aluno",          # ver COL_PESO: proibido como preditor, exigido como peso

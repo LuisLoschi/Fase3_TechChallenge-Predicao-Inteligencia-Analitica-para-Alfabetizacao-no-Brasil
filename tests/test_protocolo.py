@@ -1,11 +1,18 @@
-"""Regressões dos problemas encontrados na revisão científica."""
+"""Invariantes de protocolo: separação da reserva, domínio da projeção e status do modelo.
 
+Estes casos travam as propriedades que sustentam as ressalvas publicadas. Se um deles
+falhar, não é um teste desatualizado — é uma garantia que o projeto declara ter e
+deixou de ter.
+"""
+
+import joblib
 import numpy as np
 import pandas as pd
 import pytest
 
 from scripts.experimento_b5 import selecionar_desenvolvimento
 from src import config
+from src.evaluation.protocolo import STATUS_VALIDACAO
 from src.modeling import campeao, split
 from src.modeling.metas import ProjetorMetas, avaliar_municipios
 
@@ -65,9 +72,37 @@ def test_projecao_rejeita_entradas_invalidas(taxa, porte):
         ProjetorMetas().fit(taxa, porte, taxa)
 
 
-def test_modelo_historico_carrega_limite_da_validacao():
+def test_carregador_do_campeao_injeta_o_limite_da_validacao():
+    """O limite vem do **carregador**, não do `.joblib` — e é isso que se garante aqui.
+
+    O artefato em disco é de 2026-09-04, anterior à revisão, e foi congelado de
+    propósito: retreinar para gravar um campo de metadado trocaria a evidência
+    publicada por outra. Quem preenche `status_validacao` é `carregar_campeao()`,
+    lendo `protocolo.STATUS_VALIDACAO`. O que este teste prova é o contrato de
+    consumo: qualquer código que passe pelo carregador recebe o limite junto do
+    modelo, mesmo com um `.joblib` que não o contém. O que ele **não** prova é que
+    o arquivo serializado carregue o status — por isso as duas asserções sobre o
+    pacote cru, que fixam a assimetria em vez de escondê-la.
+    """
     if not campeao.MODELO_CAMPEAO.exists():
         pytest.skip("artefato histórico não fornecido")
+
+    cru = joblib.load(campeao.MODELO_CAMPEAO)
+    assert "status_validacao" not in cru, (
+        "o .joblib passou a carregar o status; atualize a docstring e o "
+        "GUIA_DE_EXECUCAO, porque a assimetria que este teste documenta acabou"
+    )
+
     status = campeao.carregar_campeao()["status_validacao"]
     assert status["teste_independente_da_selecao"] is False
     assert status["validacao_temporal_do_campeao"] is False
+    assert status is not STATUS_VALIDACAO, "o carregador deve devolver uma cópia"
+
+
+def test_status_da_validacao_e_a_unica_fonte_do_limite():
+    """Ninguém pode afrouxar o limite mexendo no dicionário devolvido pelo carregador."""
+    if not campeao.MODELO_CAMPEAO.exists():
+        pytest.skip("artefato histórico não fornecido")
+    campeao.carregar_campeao()["status_validacao"]["teste_independente_da_selecao"] = True
+    assert STATUS_VALIDACAO["teste_independente_da_selecao"] is False
+    assert campeao.carregar_campeao()["status_validacao"]["teste_independente_da_selecao"] is False

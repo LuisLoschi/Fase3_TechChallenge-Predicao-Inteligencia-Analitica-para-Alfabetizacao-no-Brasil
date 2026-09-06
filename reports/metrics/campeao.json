@@ -177,7 +177,7 @@
     "por_f1": 0.2970692181096789,
     "por_capacidade": 0.5251400577175789,
     "fracao_de_capacidade": 0.2,
-    "criterio": "ambos escolhidos nos escores out-of-fold do desenvolvimento; o teste não participa de nenhuma decisão"
+    "criterio": "ambos escolhidos nos escores out-of-fold do desenvolvimento; a reserva histórica não participa da escolha destes limiares"
   },
   "segundos": 188.9,
   "status_validacao": {
