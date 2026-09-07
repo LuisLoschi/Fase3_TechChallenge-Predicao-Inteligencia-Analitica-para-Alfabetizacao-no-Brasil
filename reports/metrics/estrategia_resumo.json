@@ -1,0 +1,121 @@
+{
+  "hash_dataset": "cc2215565c04d14a5ad97dbfcdda31b5",
+  "seed": 42,
+  "versoes": {
+    "sklearn": "1.8.0",
+    "lightgbm": "4.7.0"
+  },
+  "escore": {
+    "n_alunos": 1851852,
+    "n_municipios": 5517,
+    "roc_auc_out_of_fold": 0.660691191374976
+  },
+  "risco": {
+    "n_municipios": 5517,
+    "n_nao_avaliados": 23,
+    "ufs_nao_avaliadas": [
+      "AC",
+      "DF"
+    ],
+    "shrinkage": {
+      "escore_do_modelo": {
+        "k": 0.046166688333800304,
+        "mu": 0.40384428041143067
+      },
+      "taxa_observada": {
+        "k": 55.14473954361659,
+        "mu": 0.40466793434485127
+      }
+    },
+    "criancas_em_risco_total": 857543.5627346836
+  },
+  "clusters": {
+    "k_escolhido": 3,
+    "criterio": "maior silhueta na grade de 3 a 8, sobre features padronizadas",
+    "silhueta": 0.2486698847920278,
+    "n_municipios": 5461,
+    "n_fora_por_dado_faltante": 56,
+    "ufs_fora": {
+      "AC": 22,
+      "SP": 21,
+      "RS": 6,
+      "MG": 5,
+      "PR": 1,
+      "DF": 1
+    },
+    "decil_de_menor_presenca_por_cluster": {
+      "risco alto e cobertura menor": 0.6727605118829981,
+      "faixa intermediária": 0.3235831809872029,
+      "alfabetização consolidada": 0.003656307129798903
+    }
+  },
+  "metas": {
+    "versao_metodo": 2,
+    "distribuicao": "normal censurada em [0,100]; projeção pontual = mediana; dp em escala latente",
+    "n_municipios_com_meta_publicada": 5352,
+    "n_municipios_sem_meta": 165,
+    "gap_de_esforco_2025": {
+      "mediana": 2.2449999999999974,
+      "media": 2.203686472346786,
+      "ja_superam_a_meta": 0.43385650224215244,
+      "p95": 26.908999999999995
+    },
+    "persistencia": {
+      "k_shrinkage": 9.117557551090409,
+      "prior_alfabetizacao": 0.5786798346880385,
+      "deriva_ponderada_pp": 2.313071537095898,
+      "dispersao_a": 111.89896755061743,
+      "dispersao_c": 9.87322707209934,
+      "porte_referencia_dispersao": 129.0
+    },
+    "validacao_municipal_2023_2024": {
+      "protocolo": "5 folds por município na mesma transição 2023→2024; não é teste de ano futuro",
+      "porte_utilizado": "n_alunos_2023",
+      "n_municipios": 4611,
+      "prevalencia_abaixo_da_meta": 0.4649750596399913,
+      "roc_auc": {
+        "projecao_com_shrinkage_e_deriva": 0.5454704525104513,
+        "gap_ate_a_meta_sem_modelo": 0.49164871830551343,
+        "taxa_2023_invertida": 0.4876161979926069
+      },
+      "brier": 0.2475054289451941,
+      "brier_da_prevalencia": 0.24892199450943273,
+      "cobertura_intervalo_95": 0.9459986987638256,
+      "intervalos_bootstrap": {
+        "roc_auc": {
+          "pontual": 0.5454704525104513,
+          "ic_baixo": 0.5282915555152841,
+          "ic_alto": 0.5631065595771145
+        },
+        "brier": {
+          "pontual": 0.2475054289451941,
+          "ic_baixo": 0.24473589565166404,
+          "ic_alto": 0.2501891192581684
+        },
+        "ganho_brier_sobre_baseline": {
+          "pontual": 0.00141656556423863,
+          "ic_baixo": -0.001574985418852697,
+          "ic_alto": 0.004330561430171015
+        },
+        "cobertura_intervalo_95": {
+          "pontual": 0.9459986987638256,
+          "ic_baixo": 0.9394925178919974,
+          "ic_alto": 0.9520765560615918
+        }
+      },
+      "n_bootstrap": 1000,
+      "limite_dos_intervalos": "condicionais às predições OOF; folds compartilham treino; não medem drift temporal"
+    },
+    "share_com_probabilidade_entre_40_e_60": 0.24476831091180867,
+    "share_com_meta_dentro_do_intervalo_de_95": 0.9753363228699552,
+    "n_com_meta_fora_do_intervalo_de_95": 132,
+    "largura_mediana_do_intervalo_pp": 51.96518141135911,
+    "share_abaixo_referencia_dispersao": 0.5431614349775785,
+    "evolucao_2023_2024": {
+      "mediana_pp": 2.5,
+      "dp_pp": 16.977534048321832,
+      "share_que_piorou": 0.4174799392756452
+    }
+  },
+  "segundos": 8.5
+}

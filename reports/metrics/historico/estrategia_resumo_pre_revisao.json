@@ -1,0 +1,93 @@
+{
+  "hash_dataset": "cc2215565c04d14a5ad97dbfcdda31b5",
+  "seed": 42,
+  "versoes": {
+    "sklearn": "1.8.0",
+    "lightgbm": "4.7.0"
+  },
+  "escore": {
+    "n_alunos": 1851852,
+    "n_municipios": 5517,
+    "roc_auc_out_of_fold": 0.660691191374976
+  },
+  "risco": {
+    "n_municipios": 5517,
+    "n_nao_avaliados": 23,
+    "ufs_nao_avaliadas": [
+      "AC",
+      "DF"
+    ],
+    "shrinkage": {
+      "escore_do_modelo": {
+        "k": 0.046166688333800304,
+        "mu": 0.40384428041143067
+      },
+      "taxa_observada": {
+        "k": 55.14473954361659,
+        "mu": 0.40466793434485127
+      }
+    },
+    "criancas_em_risco_total": 857543.5627346836
+  },
+  "clusters": {
+    "k_escolhido": 3,
+    "criterio": "maior silhueta na grade de 3 a 8, sobre features padronizadas",
+    "silhueta": 0.2486698847920278,
+    "n_municipios": 5461,
+    "n_fora_por_dado_faltante": 56,
+    "ufs_fora": {
+      "AC": 22,
+      "SP": 21,
+      "RS": 6,
+      "MG": 5,
+      "PR": 1,
+      "DF": 1
+    },
+    "decil_de_menor_presenca_por_cluster": {
+      "risco alto e cobertura menor": 0.6727605118829981,
+      "faixa intermediária": 0.3235831809872029,
+      "alfabetização consolidada": 0.003656307129798903
+    }
+  },
+  "metas": {
+    "n_municipios_com_meta_publicada": 5352,
+    "n_municipios_sem_meta": 165,
+    "gap_de_esforco_2025": {
+      "mediana": 2.2449999999999974,
+      "media": 2.203686472346786,
+      "ja_superam_a_meta": 0.43385650224215244,
+      "p95": 26.908999999999995
+    },
+    "persistencia": {
+      "k_shrinkage_2023": 9.117557551090409,
+      "k_shrinkage_2024": 10.14127486455577,
+      "deriva_nacional_pp": 2.387592374298133,
+      "dispersao_a": 107.6869955468165,
+      "dispersao_c": 9.90625449029121,
+      "limiar_de_porte_para_meta_individual": 119.0
+    },
+    "backtest_2023_2024": {
+      "n_municipios": 4611,
+      "prevalencia_abaixo_da_meta": 0.4649750596399913,
+      "roc_auc": {
+        "projecao_com_shrinkage_e_deriva": 0.5445435721675369,
+        "gap_ate_a_meta_sem_modelo": 0.49164871830551343,
+        "taxa_2023_invertida": 0.4876161979926069
+      },
+      "brier": 0.24728082374896493,
+      "brier_da_prevalencia": 0.24877325355277782
+    },
+    "share_com_probabilidade_entre_40_e_60": 0.2445814648729447,
+    "share_com_meta_dentro_do_intervalo_de_95": 0.9749626307922272,
+    "n_com_meta_fora_do_intervalo_de_95": 134,
+    "largura_mediana_do_intervalo_pp": 55.66868702837701,
+    "share_com_porte_para_meta_individual": 0.484304932735426,
+    "evolucao_2023_2024": {
+      "mediana_pp": 2.5,
+      "dp_pp": 16.977534048321832,
+      "share_que_piorou": 0.4174799392756452
+    },
+    "abaixo_da_meta_2024": 0.4649750596399913
+  },
+  "segundos": 6.3
+}

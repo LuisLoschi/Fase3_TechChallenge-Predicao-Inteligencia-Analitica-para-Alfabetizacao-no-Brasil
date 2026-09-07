@@ -1,0 +1,106 @@
+{
+  "hash_dataset": "cc2215565c04d14a5ad97dbfcdda31b5",
+  "seed": 42,
+  "versoes": {
+    "sklearn": "1.8.0",
+    "lightgbm": "4.7.0",
+    "shap": "0.52.0"
+  },
+  "amostra_shap": {
+    "n": 50000,
+    "n_gold": 43263,
+    "origem": "conjunto de teste, municípios inéditos",
+    "valor_esperado_log_odds": -0.43595744974951317
+  },
+  "permutacao": {
+    "n": 330836,
+    "n_repeticoes": 10,
+    "piso_de_ruido": 0.002,
+    "roc_auc_referencia": 0.6598992919366803
+  },
+  "familias": {
+    "historico_municipal": [
+      "mun_taxa_alfab_lag1",
+      "mun_media_portugues_lag1",
+      "mun_taxa_presenca_lag1",
+      "mun_n_alunos_lag1",
+      "mun_n_escolas_lag1",
+      "mun_share_rede_estadual_lag1",
+      "mun_desvio_vs_uf"
+    ],
+    "metas": [
+      "mun_meta_2024_lag1",
+      "mun_nivel_alfabetizacao_lag1"
+    ],
+    "territorial": [
+      "uf_taxa_alfab_lag1",
+      "uf_media_portugues_lag1",
+      "uf_taxa_presenca_lag1",
+      "sigla_uf",
+      "nome_regiao"
+    ],
+    "historico_escolar": [
+      "tem_historico_escola"
+    ],
+    "estrutural": [
+      "rede_grupo",
+      "caderno",
+      "tem_historico_municipio",
+      "fonte_lag_municipal",
+      "fonte_lag_uf"
+    ]
+  },
+  "hipoteses": [
+    {
+      "hipotese": "H1",
+      "enunciado": "o contexto municipal de 2023 é o preditor dominante do risco individual em 2024",
+      "criterio_de_falseamento": "uma família não municipal aparecer no topo do SHAP",
+      "medido": {
+        "familia_no_topo_do_shap": "historico_municipal",
+        "familia_no_topo_da_permutacao_em_bloco": "historico_municipal",
+        "ordem_shap": [
+          "historico_municipal",
+          "territorial",
+          "estrutural",
+          "metas",
+          "historico_escolar"
+        ],
+        "ordem_permutacao": [
+          "historico_municipal",
+          "territorial",
+          "estrutural",
+          "metas",
+          "historico_escolar"
+        ]
+      },
+      "veredito": "sustentada"
+    },
+    {
+      "hipotese": "H2",
+      "enunciado": "o histórico escolar verdadeiro acrescentaria sinal além do município?",
+      "criterio_de_falseamento": "a família de histórico escolar não aparecer no fim da lista",
+      "medido": {
+        "posicao_no_shap": 5,
+        "posicao_na_permutacao": 5,
+        "de_um_total_de": 5,
+        "ressalva": "a família se resume a `tem_historico_escola`; o bloco `esc_*` é ligado por identificadores reciclados; isso não testa o valor de um histórico escolar longitudinal verdadeiro"
+      },
+      "veredito": "não verificável"
+    },
+    {
+      "hipotese": "H5",
+      "enunciado": "a presença municipal anterior está associada ao risco observado entre presentes",
+      "criterio_de_falseamento": "`mun_taxa_presenca_lag1` não aparecer entre as features relevantes — lido como estar no topo 5 do SHAP e derrubar mais que o piso de ruído de 0.002 por permutação",
+      "medido": {
+        "queda_por_permutacao": 0.0026072022239511,
+        "piso_de_ruido": 0.002,
+        "posicao_no_shap": 5.0,
+        "posicao_na_permutacao": 8.0,
+        "posicao_na_logistica": 5.0,
+        "veredito_da_triangulacao": "achado sobre a leitura"
+      },
+      "veredito": "sustentada"
+    }
+  ],
+  "segundos": 618.4
+}

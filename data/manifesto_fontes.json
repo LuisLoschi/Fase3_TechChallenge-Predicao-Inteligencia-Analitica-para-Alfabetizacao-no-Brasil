@@ -1,0 +1,39 @@
+{
+  "fontes": [
+    {
+      "caminho": "raw/alfabetizacao_aluno/alfabetizacao_aluno_features_2023-2024_20260829.csv",
+      "bytes": 644589055,
+      "sha256": "6eaaf5b68bb9cd141cdceb614f3c51b3ea202b1efa808a159353a8c832fc55c2"
+    },
+    {
+      "caminho": "raw/inep/br_inep_avaliacao_alfabetizacao_aluno.csv",
+      "bytes": 224042953,
+      "sha256": "251e441c86f891f0d2ea38a1f6e596985e9574ed9f0e24c584f336dbc978df3b"
+    },
+    {
+      "caminho": "raw/inep/br_inep_avaliacao_alfabetizacao_meta_alfabetizacao_municipio.csv",
+      "bytes": 759947,
+      "sha256": "953c4f95e0b03b2f00500faff228c2de949026005838c859f9de5e503b2787ec"
+    },
+    {
+      "caminho": "raw/inep/br_inep_avaliacao_alfabetizacao_meta_alfabetizacao_uf.csv",
+      "bytes": 3429,
+      "sha256": "aaf11c522a4354932599889032dbf1caa4f868e3a4f2a1fea03ad61e5a382dea"
+    },
+    {
+      "caminho": "raw/inep/br_inep_avaliacao_alfabetizacao_meta_alfabetizacao_brasil.csv",
+      "bytes": 388,
+      "sha256": "4c0faa90a8ecac2e1f9ab8b11d0d2337de5bf1e0cbf4c41a05293f5a30437626"
+    },
+    {
+      "caminho": "raw/inep/br_inep_avaliacao_alfabetizacao_municipio.csv",
+      "bytes": 1395024,
+      "sha256": "3a2e6bbae04969d2f76cb011037b23d27a5f9e3f8cd29a8224f194f6e867b3e7"
+    },
+    {
+      "caminho": "raw/inep/br_inep_avaliacao_alfabetizacao_uf.csv",
+      "bytes": 8248,
+      "sha256": "ec48d1886a6f4c6c479057d5321dc6a1d50226f0cef754e70f4f2a8201faa9e6"
+    }
+  ]
+}

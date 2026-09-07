@@ -1,0 +1,5 @@
+ordenacao,n_alunos_mediano,municipios_com_menos_de_50_alunos,criancas_em_risco,share_das_criancas_em_risco,taxa_presenca_mediana,municipios_em_comum_com_a_lista_por_taxa
+taxa observada crua,60.0,21,3359.2502174982533,0.004011224373737801,0.894058994599086,9
+taxa observada ajustada,159.0,4,7428.234613153673,0.00886993043236747,0.9154336644824914,17
+risco do modelo (publicado),147.5,2,8369.122778549794,0.009993429218596342,0.9216595701540957,50
+volume de crianças (publicado),6102.5,0,242713.75301268898,0.28982042387153045,0.8543457061944351,0

@@ -1,0 +1,15 @@
+coluna,feature,coeficiente,razao_de_chances,coeficiente_dp_entre_folds,folds_com_a_coluna,troca_de_sinal_entre_folds,contribuicao_dp,familia,sub_bloco
+mun_taxa_alfab_lag1,mun_taxa_alfab_lag1,-0.4273182496128407,0.6522559389931794,0.00782828773901325,5,False,0.4273183900847122,historico_municipal,historico_municipal
+uf_taxa_alfab_lag1,uf_taxa_alfab_lag1,-0.16591914285370576,0.8471147266996927,0.010240047174324482,5,False,0.16591919739580802,territorial,territorial
+nome_regiao_Sudeste,nome_regiao,-0.3096610306573543,0.7336956143982741,0.010875881105056554,5,False,0.15088123765186237,territorial,territorial
+mun_taxa_presenca_lag1,mun_taxa_presenca_lag1,-0.11742838285720236,0.889204191729707,0.008526532350998586,5,False,0.11742842145908645,historico_municipal,historico_municipal
+rede_grupo_Estadual,rede_grupo,-0.31599548677794165,0.7290627405822413,0.025459411283856488,5,False,0.11077248425683747,estrutural,estrutural
+nome_regiao_Sul,nome_regiao,0.2774456851272787,1.3197544349028612,0.019719937079580523,5,False,0.10006032217744543,territorial,territorial
+tem_historico_municipio,tem_historico_municipio,-0.09443414340728734,0.909887654753634,0.013930186054678814,5,False,0.09443417445009977,estrutural,proveniencia_do_lag
+mun_share_rede_estadual_lag1,mun_share_rede_estadual_lag1,0.05590094228896131,1.057492925719491,0.00491100686750055,5,False,0.05590096066511199,historico_municipal,historico_municipal
+nome_regiao_Centro-Oeste,nome_regiao,-0.17061214670026253,0.8431485280010788,0.024660418558362103,5,False,0.05114451259470335,territorial,territorial
+mun_n_alunos_lag1,mun_n_alunos_lag1,0.022796684104674152,1.0230585143427045,0.019090675253870117,5,False,0.022796691598664764,historico_municipal,historico_municipal
+nome_regiao_Norte,nome_regiao,-0.05547220491868092,0.9460383185169934,0.018742776681477537,5,False,0.016845322153154204,territorial,territorial
+nome_regiao_Nordeste,nome_regiao,-0.02799658119245669,0.9723916912156131,0.026585529760783832,5,False,0.012216993953411557,territorial,territorial
+rede_grupo_Municipal,rede_grupo,0.030286998555185067,1.030750315358333,0.022658390215321456,5,True,0.010617618901013103,estrutural,estrutural
+rede_grupo_Outros,rede_grupo,-0.0005877901186937246,0.9994123825960765,5.279807529416875e-05,4,False,2.3348432360906014e-06,estrutural,estrutural
